@@ -129,28 +129,26 @@ public class TankDriveClimberLinearUltrasonic extends LinearOpMode {
 
 
         turnLeft(.5);
-        sleep(900);
+        sleep(800);
         stopDrive();
         sleep(250);
-
-        forward(.5);
-        sleep(1000);
+        forward(.75);
+        sleep(1500);
         stopDrive();
-        sleep(250);
 
-        tape.setPower(1);
-        sleep(3500);
-        tape.setPower(0);
-        sleep(250);
+//        tape.setPower(1);
+//        sleep(3600);
+//        tape.setPower(0);
+//        sleep(250);
+//
+//        adjust.setPosition(Servo.MIN_POSITION);
+//        sleep(500);
+//        tape.setPower(-1);
 
-        adjust.setPosition(Servo.MIN_POSITION);
-        sleep(500);
-        tape.setPower(-.5);
-        forward(1);
-        sleep(700);
-        tape.setPower(0);
-        stopDrive();
-        sleep(250);
+//
+//        tape.setPower(0);
+//        stopDrive();
+//        sleep(250);
 
     }
 }
