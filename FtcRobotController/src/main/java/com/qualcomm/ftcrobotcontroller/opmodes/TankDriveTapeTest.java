@@ -14,7 +14,7 @@ public class TankDriveTapeTest extends OpMode{
     Servo climberLeft;
     Servo climberRight;
     DcMotor tape;
-    Servo adjust;
+    DcMotor adjust;
     //Servo deposit;
     //Servo safe;
     // Servo allClear;
@@ -41,14 +41,14 @@ public class TankDriveTapeTest extends OpMode{
 
         backRightDrive = hardwareMap.dcMotor.get("backRightDrive");
         backLeftDrive = hardwareMap.dcMotor.get("backLeftDrive");
-        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
         frontRightDrive = hardwareMap.dcMotor.get("frontRightDrive");
         frontLeftDrive = hardwareMap.dcMotor.get("frontLeftDrive");
-        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
         climberLeft = hardwareMap.servo.get("climberLeft");
         climberRight = hardwareMap.servo.get("climberRight");
         tape = hardwareMap.dcMotor.get("tape");
-        adjust = hardwareMap.servo.get("adjust");
+        adjust = hardwareMap.dcMotor.get("adjust");
         //deposit = hardwareMap.servo.get("deposit");
         //safe = hardwareMap.servo.get("safe");
         // allClear = hardwareMap.servo.get("clear");
@@ -147,35 +147,31 @@ public class TankDriveTapeTest extends OpMode{
         }
 
         if (gamepad1.right_bumper) {
-            if (adjust.getPosition() < 0.99) {
-                adjust.setPosition(adjust.getPosition() + 0.01);
-            }
+            adjust.setPower(0.1);
         }
 
         else if (gamepad1.left_bumper) {
-            if(adjust.getPosition() > 0.01) {
-                adjust.setPosition(adjust.getPosition() - 0.01);
-            }
+            adjust.setPower(-0.1);
         }
 
         else {
-            //adjust.setPower(0);
+            adjust.setPower(0);
         }
 
-        if (gamepad1.guide) {
-
-            if (reversed) {
-                reversed = false;
-                adjust.setDirection(Servo.Direction.FORWARD);
-                tape.setDirection(DcMotor.Direction.FORWARD);
-            }
-
-            else {
-                reversed = true;
-                adjust.setDirection(Servo.Direction.REVERSE);
-                tape.setDirection(DcMotor.Direction.REVERSE);
-            }
-        }
+//        if (gamepad1.guide) {
+//
+//            if (reversed) {
+//                reversed = false;
+//                adjust.setDirection(Servo.Direction.FORWARD);
+//                tape.setDirection(DcMotor.Direction.FORWARD);
+//            }
+//
+//            else {
+//                reversed = true;
+//                adjust.setDirection(Servo.Direction.REVERSE);
+//                tape.setDirection(DcMotor.Direction.REVERSE);
+//            }
+//        }
 
 //        if (gamepad2.a) {
 //            allClear.setPosition(Servo.MAX_POSITION);
