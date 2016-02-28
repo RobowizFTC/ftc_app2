@@ -34,7 +34,7 @@ public class TankDriveClimberLinearUltrasonic extends LinearOpMode {
     DcMotor frontLeftDrive;
     DcMotor frontRightDrive;
     DcMotor tape;
-    Servo adjust;
+    DcMotor adjust;
     Servo deposit;
     LegacyModule legacyModule;
     UltrasonicSensor ultraLeft;
@@ -98,15 +98,15 @@ public class TankDriveClimberLinearUltrasonic extends LinearOpMode {
         frontLeftDrive = hardwareMap.dcMotor.get("frontLeftDrive");
         frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         tape = hardwareMap.dcMotor.get("tape");
-        adjust = hardwareMap.servo.get("adjust");
+        adjust = hardwareMap.dcMotor.get("adjust");
         deposit = hardwareMap.servo.get("deposit");
         //legacyModule = hardwareMap.legacyModule.get("legacy");
         //ultraLeft = hardwareMap.ultrasonicSensor.get("ultraLeft");
         //ultraRight = hardwareMap.ultrasonicSensor.get("ultraRight");
-        waitForStart();
 
+        // init
         deposit.setPosition(Servo.MAX_POSITION);
-
+        waitForStart();
 //        boolean seen = false;
 //        forward(.60);
 //        sleep(1000);
@@ -116,7 +116,7 @@ public class TankDriveClimberLinearUltrasonic extends LinearOpMode {
 //            seen = seeRamp(ultraLeft, ultraRight);
 //        }
 //        stopDrive();
-
+        sleep(20000);
         backwards(.5);
         sleep(2500);
         stopDrive();
@@ -129,7 +129,7 @@ public class TankDriveClimberLinearUltrasonic extends LinearOpMode {
 
 
         turnLeft(.5);
-        sleep(800);
+        sleep(1050);
         stopDrive();
         sleep(250);
         forward(.75);

@@ -55,7 +55,8 @@ public class FtcOpModeRegister implements OpModeRegister {
      * If two or more op modes are registered with the same name, the app will display an error.
      */
       manager.register("Tele-Op", TankDriveTapeTest.class);
-      manager.register("UltrasonicAuto", TankDriveClimberLinearUltrasonic.class);
+      manager.register("AutoBlue", TankDriveClimberLinearUltrasonic.class);
+      manager.register("AutoRed", TankDriveClimberLinearUltrasonicRed.class);
       manager.register("Accel", AccelerometerComponent.class);
 //    manager.register("NullOp", NullOp.class);
 //

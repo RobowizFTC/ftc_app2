@@ -13,7 +13,7 @@ public class TankDriveTapeTest extends OpMode{
     DcMotor backRightDrive;
     Servo climber;
     DcMotor tape;
-    Servo adjust;
+    DcMotor adjust;
     Servo deposit;
     Servo safe;
     boolean reversed = false;
@@ -43,7 +43,7 @@ public class TankDriveTapeTest extends OpMode{
         frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         climber = hardwareMap.servo.get("climber");
         tape = hardwareMap.dcMotor.get("tape");
-        adjust = hardwareMap.servo.get("adjust");
+        adjust = hardwareMap.dcMotor.get("adjust");
         deposit = hardwareMap.servo.get("deposit");
         safe = hardwareMap.servo.get("safe");
     }
@@ -105,13 +105,14 @@ public class TankDriveTapeTest extends OpMode{
         }
 
         else if(gamepad1.dpad_down) {
-            safe.setPosition(Servo.MIN_POSITION);
+            safe.setPosition(Servo.MIN_POSITION + 0.25);
         }
 
         if (gamepad1.x) {
             pos = deposit.getPosition() - .1;
             if (pos < 0)
-                pos = 0.01;
+                //pos = 0.01;
+                pos = 0.4;
             deposit.setPosition(pos);
         }
         if (gamepad1.right_trigger >= .3) {
@@ -126,33 +127,29 @@ public class TankDriveTapeTest extends OpMode{
             tape.setPower(0);
         }
 
-        if (gamepad1.right_bumper) {
-            if (adjust.getPosition() < 0.99) {
-                adjust.setPosition(adjust.getPosition() + 0.01);
-            }
+        if (gamepad1.left_bumper) {
+            adjust.setPower(0.1);
         }
 
-        else if (gamepad1.left_bumper) {
-            if(adjust.getPosition() > 0.01) {
-                adjust.setPosition(adjust.getPosition() - 0.01);
-            }
+        else if (gamepad1.right_bumper) {
+            adjust.setPower(-0.1);
         }
 
         else {
-            //adjust.setPower(0);
+            adjust.setPower(0);
         }
 
         if (gamepad1.guide) {
 
             if (reversed) {
                 reversed = false;
-                adjust.setDirection(Servo.Direction.FORWARD);
+                //adjust.setDirection(Servo.Direction.FORWARD);
                 tape.setDirection(DcMotor.Direction.FORWARD);
             }
 
             else {
                 reversed = true;
-                adjust.setDirection(Servo.Direction.REVERSE);
+                //adjust.setDirection(Servo.Direction.REVERSE);
                 tape.setDirection(DcMotor.Direction.REVERSE);
             }
         }
