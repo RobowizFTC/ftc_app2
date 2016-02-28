@@ -16,6 +16,7 @@ public class TankDriveTapeTest extends OpMode{
     Servo adjust;
     Servo deposit;
     Servo safe;
+    Servo allClear;
     boolean reversed = false;
     int i = 0;
     double pos;
@@ -46,6 +47,7 @@ public class TankDriveTapeTest extends OpMode{
         adjust = hardwareMap.servo.get("adjust");
         deposit = hardwareMap.servo.get("deposit");
         safe = hardwareMap.servo.get("safe");
+        allClear = hardwareMap.servo.get("clear");
     }
 
     @Override
@@ -155,6 +157,14 @@ public class TankDriveTapeTest extends OpMode{
                 adjust.setDirection(Servo.Direction.REVERSE);
                 tape.setDirection(DcMotor.Direction.REVERSE);
             }
+        }
+
+        if (gamepad2.a) {
+            allClear.setPosition(Servo.MAX_POSITION);
+        }
+
+        if (gamepad2.y) {
+            allClear.setPosition(Servo.MIN_POSITION);
         }
 
 
