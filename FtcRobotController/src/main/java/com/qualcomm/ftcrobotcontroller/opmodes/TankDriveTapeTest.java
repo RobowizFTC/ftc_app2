@@ -11,13 +11,16 @@ public class TankDriveTapeTest extends OpMode{
     DcMotor frontRightDrive;
     DcMotor backLeftDrive;
     DcMotor backRightDrive;
-    Servo climber;
+    Servo climberLeft;
+    Servo climberRight;
     DcMotor tape;
     Servo adjust;
-    Servo deposit;
-    Servo safe;
-    Servo allClear;
+    //Servo deposit;
+    //Servo safe;
+    // Servo allClear;
     boolean reversed = false;
+    boolean rightExtended = false;
+    boolean leftExtended = false;
     int i = 0;
     double pos;
 
@@ -42,12 +45,13 @@ public class TankDriveTapeTest extends OpMode{
         frontRightDrive = hardwareMap.dcMotor.get("frontRightDrive");
         frontLeftDrive = hardwareMap.dcMotor.get("frontLeftDrive");
         frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        climber = hardwareMap.servo.get("climber");
+        climberLeft = hardwareMap.servo.get("climberLeft");
+        climberRight = hardwareMap.servo.get("climberRight");
         tape = hardwareMap.dcMotor.get("tape");
         adjust = hardwareMap.servo.get("adjust");
-        deposit = hardwareMap.servo.get("deposit");
-        safe = hardwareMap.servo.get("safe");
-        allClear = hardwareMap.servo.get("clear");
+        //deposit = hardwareMap.servo.get("deposit");
+        //safe = hardwareMap.servo.get("safe");
+        // allClear = hardwareMap.servo.get("clear");
     }
 
     @Override
@@ -87,35 +91,49 @@ public class TankDriveTapeTest extends OpMode{
 //            // the climberServo servo.
 //            climber.setPosition(Servo.MAX_POSITION * .95);
 //        }
-        if (gamepad1.b) {
-            pos = deposit.getPosition() + .1;
-            if (pos > 1)
-                pos = .99;
-            deposit.setPosition(pos);
-        }
-
-        if (gamepad1.dpad_up) {
-            safe.setPosition(Servo.MAX_POSITION);
-        }
+//        if (gamepad1.b) {
+//            pos = deposit.getPosition() + .1;
+//            if (pos > 1)
+//                pos = .99;
+//            deposit.setPosition(pos);
+//        }
+//
+//        if (gamepad1.dpad_up) {
+//            safe.setPosition(Servo.MAX_POSITION);
+//        }
 
         if (gamepad1.dpad_right){
-            climber.setPosition(0.5);
+            if (rightExtended) {
+                climberRight.setPosition(Servo.MIN_POSITION);
+                rightExtended = false;
+            }
+            else {
+                climberRight.setPosition(0.5);
+                rightExtended = true;
+            }
         }
 
         if (gamepad1.dpad_left){
-            climber.setPosition(Servo.MIN_POSITION);
+            if (leftExtended) {
+                climberLeft.setPosition(Servo.MIN_POSITION);
+                leftExtended = false;
+            }
+            else {
+                climberLeft.setPosition(0.5);
+                leftExtended = true;
+            }
         }
 
-        else if(gamepad1.dpad_down) {
-            safe.setPosition(Servo.MIN_POSITION);
-        }
-
-        if (gamepad1.x) {
-            pos = deposit.getPosition() - .1;
-            if (pos < 0)
-                pos = 0.01;
-            deposit.setPosition(pos);
-        }
+//        else if(gamepad1.dpad_down) {
+//            safe.setPosition(Servo.MIN_POSITION);
+//        }
+//
+//        if (gamepad1.x) {
+//            pos = deposit.getPosition() - .1;
+//            if (pos < 0)
+//                pos = 0.01;
+//            deposit.setPosition(pos);
+//        }
         if (gamepad1.right_trigger >= .3) {
             tape.setPower(.5);
         }
@@ -159,13 +177,13 @@ public class TankDriveTapeTest extends OpMode{
             }
         }
 
-        if (gamepad2.a) {
-            allClear.setPosition(Servo.MAX_POSITION);
-        }
-
-        if (gamepad2.y) {
-            allClear.setPosition(Servo.MIN_POSITION);
-        }
+//        if (gamepad2.a) {
+//            allClear.setPosition(Servo.MAX_POSITION);
+//        }
+//
+//        if (gamepad2.y) {
+//            allClear.setPosition(Servo.MIN_POSITION);
+//        }
 
 
         // update the position of the claw

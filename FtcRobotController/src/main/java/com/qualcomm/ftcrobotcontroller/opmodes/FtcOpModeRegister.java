@@ -56,6 +56,7 @@ public class FtcOpModeRegister implements OpModeRegister {
      */
       manager.register("Tele-Op", TankDriveTapeTest.class);
       manager.register("VisionTest", BasicVisionSample.class);
+      manager.register("LightTest", BasicLightSample.class);
       manager.register("Accel", AccelerometerComponent.class);
 //    manager.register("NullOp", NullOp.class);
 //

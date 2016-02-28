@@ -31,6 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.LegacyModule;
+import com.qualcomm.robotcore.hardware.LightSensor;
+
 import org.lasarobotics.vision.android.Cameras;
 import org.lasarobotics.vision.ftc.resq.Beacon;
 import org.lasarobotics.vision.opmode.VisionOpMode;
@@ -41,47 +45,22 @@ import org.opencv.core.Size;
  * <p/>
  * Enables control of the robot via the gamepad
  */
-public class BasicVisionSample extends VisionOpMode {
+public class BasicLightSample extends OpMode {
+
+    LegacyModule legacy;
+    LightSensor light;
 
     @Override
     public void init() {
-        super.init();
-
-        //Set the camera used for detection
-        this.setCamera(Cameras.SECONDARY);
-        //Set the frame size
-        //Larger = sometimes more accurate, but also much slower
-        //For Testable OpModes, this might make the image appear small - it might be best not to use this
-        this.setFrameSize(new Size(900, 900));
-
-        //Enable extensions. Use what you need.
-        enableExtension(Extensions.BEACON);     //Beacon detection
-        enableExtension(Extensions.ROTATION);   //Automatic screen rotation correction
-
-        //UNCOMMENT THIS IF you're using a SECONDARY (facing toward screen) camera
-        //or when you rotate the phone, sometimes the colors swap
-        rotation.setRotationInversion(true);
-
-        //You can do this for certain phones which switch red and blue
-        //It will rotate the display and detection by 180 degrees, making it upright
-        //rotation.setUnbiasedOrientation(ScreenOrientation.LANDSCAPE_WEST);
-
-        //Set the beacon analysis method
-        //Try them all and see what works!
-        beacon.setAnalysisMethod(Beacon.AnalysisMethod.FAST);
+        legacy = hardwareMap.legacyModule.get("legacy");
+        light = hardwareMap.lightSensor.get("ls");
+        legacy.enable9v(5, true);
     }
 
     @Override
     public void loop() {
-
-        super.loop();
-
-        telemetry.addData("Beacon Color", beacon.getAnalysis().getColorString());
-        telemetry.addData("Beacon Location (Center)", beacon.getAnalysis().getLocationString());
-        telemetry.addData("Beacon Confidence", beacon.getAnalysis().getConfidenceString());
-        telemetry.addData("Rotation Compensation", rotation.getRotationCompensationAngle());
-        telemetry.addData("Frame Rate", fps.getFPSString() + " FPS");
-        telemetry.addData("Frame Size", "Width: " + width + " Height: " + height);
+        double reflect = light.getLightDetected();
+        telemetry.addData("light", "Light: " + reflect);
     }
 
     @Override
