@@ -102,7 +102,7 @@ public class TankDriveTapeTest extends OpMode{
 //            safe.setPosition(Servo.MAX_POSITION);
 //        }
 
-        if (gamepad1.dpad_right){
+        if (gamepad1.b){
             if (rightExtended) {
                 climberRight.setPosition(Servo.MIN_POSITION);
                 rightExtended = false;
@@ -113,7 +113,7 @@ public class TankDriveTapeTest extends OpMode{
             }
         }
 
-        if (gamepad1.dpad_left){
+        if (gamepad1.x){
             if (leftExtended) {
                 climberLeft.setPosition(Servo.MIN_POSITION);
                 leftExtended = false;
