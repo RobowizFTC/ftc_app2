@@ -13,10 +13,11 @@ public class TankDriveTapeTest extends OpMode{
     DcMotor backRightDrive;
     Servo climberLeft;
     Servo climberRight;
+    Servo middle;
     DcMotor tape;
-    DcMotor adjust;
+    Servo adjust;
     //Servo deposit;
-    //Servo safe;
+    Servo safe;
     // Servo allClear;
     boolean reversed = false;
     boolean rightExtended = false;
@@ -41,16 +42,17 @@ public class TankDriveTapeTest extends OpMode{
 
         backRightDrive = hardwareMap.dcMotor.get("backRightDrive");
         backLeftDrive = hardwareMap.dcMotor.get("backLeftDrive");
-        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         frontRightDrive = hardwareMap.dcMotor.get("frontRightDrive");
         frontLeftDrive = hardwareMap.dcMotor.get("frontLeftDrive");
-        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         climberLeft = hardwareMap.servo.get("climberLeft");
         climberRight = hardwareMap.servo.get("climberRight");
         tape = hardwareMap.dcMotor.get("tape");
-        adjust = hardwareMap.dcMotor.get("adjust");
+        adjust = hardwareMap.servo.get("adjust");
+        middle = hardwareMap.servo.get("middle");
         //deposit = hardwareMap.servo.get("deposit");
-        //safe = hardwareMap.servo.get("safe");
+        safe = hardwareMap.servo.get("safe");
         // allClear = hardwareMap.servo.get("clear");
     }
 
@@ -74,10 +76,19 @@ public class TankDriveTapeTest extends OpMode{
         left =  (float)scaleInput(left);
 
         // write the values to the motors
+
+        if (right >= .8)
+            middle.setPosition(Servo.MIN_POSITION);
+        else if (right <= -.8)
+            middle.setPosition(Servo.MAX_POSITION);
+        else
+            middle.setPosition(0.5);
+
         frontRightDrive.setPower(right);
         frontLeftDrive.setPower(left);
         backRightDrive.setPower(right);
         backLeftDrive.setPower(left);
+
 
         // update the position of the climberServo.
 //        if (gamepad1.y) {
@@ -98,9 +109,9 @@ public class TankDriveTapeTest extends OpMode{
 //            deposit.setPosition(pos);
 //        }
 //
-//        if (gamepad1.dpad_up) {
-//            safe.setPosition(Servo.MAX_POSITION);
-//        }
+        if (gamepad1.dpad_up) {
+            safe.setPosition(Servo.MAX_POSITION);
+        }
 
         if (gamepad1.b){
             if (rightExtended) {
@@ -124,9 +135,9 @@ public class TankDriveTapeTest extends OpMode{
             }
         }
 
-//        else if(gamepad1.dpad_down) {
-//            safe.setPosition(Servo.MIN_POSITION);
-//        }
+        else if(gamepad1.dpad_down) {
+            safe.setPosition(Servo.MIN_POSITION);
+        }
 //
 //        if (gamepad1.x) {
 //            pos = deposit.getPosition() - .1;
@@ -147,16 +158,17 @@ public class TankDriveTapeTest extends OpMode{
         }
 
         if (gamepad1.right_bumper) {
-            adjust.setPower(0.1);
+            if (adjust.getPosition() < 0.99) {
+                adjust.setPosition(adjust.getPosition() + 0.01);
+            }
         }
 
         else if (gamepad1.left_bumper) {
-            adjust.setPower(-0.1);
+            if (adjust.getPosition() > 0.01) {
+                adjust.setPosition(adjust.getPosition() - 0.01);
+            }
         }
 
-        else {
-            adjust.setPower(0);
-        }
 
 //        if (gamepad1.guide) {
 //
@@ -200,7 +212,6 @@ public class TankDriveTapeTest extends OpMode{
 
     @Override
     public void stop() {
-
     }
 
     /*

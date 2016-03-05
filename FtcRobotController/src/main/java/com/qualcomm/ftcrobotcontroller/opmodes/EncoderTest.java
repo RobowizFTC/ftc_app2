@@ -38,22 +38,25 @@ public class EncoderTest extends LinearOpMode {
     Servo adjust;
     Servo deposit;
 
+    int ANDYMARK_TICKS_PER_REV = 1680;
+    double Inches_per_Rotation = 13.125;
+
     @Override public void runOpMode() throws InterruptedException{
         //Initialize hardware
         backLeftDrive = hardwareMap.dcMotor.get("backLeftDrive");
         backRightDrive = hardwareMap.dcMotor.get("backRightDrive");
         frontLeftDrive = hardwareMap.dcMotor.get("frontLeftDrive");
         frontRightDrive = hardwareMap.dcMotor.get("frontRightDrive");
-        tape = hardwareMap.dcMotor.get("tape");
+        //tape = hardwareMap.dcMotor.get("tape");
 
-        adjust = hardwareMap.servo.get("adjust");
-        deposit = hardwareMap.servo.get("deposit");
+        //adjust = hardwareMap.servo.get("adjust");
+        //deposit = hardwareMap.servo.get("deposit");
 
         backLeftDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         backRightDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        frontLeftDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        frontRightDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        tape.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        //frontLeftDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        //frontRightDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        //tape.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
 
         backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -61,29 +64,34 @@ public class EncoderTest extends LinearOpMode {
         //Wait for the game to start
         waitForStart();
 
-        int ANDYMARK_TICKS_PER_REV = 1120;
+        //deposit.setPosition(Servo.MAX_POSITION);
 
-        deposit.setPosition(Servo.MAX_POSITION);
+//        backwards(.5);
+//        sleep(2500);
+//        stopDrive();
+//        sleep(250);
+//
+//        forward(.5);
+//        sleep(700);
+//        stopDrive();
+//        sleep(250);
+//
+//        turnLeft(.5);
+//        sleep(800);
+//        stopDrive();
+//        sleep(250);
+//        forward(.75);
+//        sleep(1500);
+//        stopDrive();
 
-        backwards(.5);
-        sleep(2500);
-        stopDrive();
-        sleep(250);
+        telemetry.addData("ticks", "" + findTicks(24));
+        driveForwardDistance(1,findTicks(24));
+        stop();
 
-        forward(.5);
-        sleep(700);
-        stopDrive();
-        sleep(250);
+    }
 
-
-        turnLeft(.5);
-        sleep(800);
-        stopDrive();
-        sleep(250);
-        forward(.75);
-        sleep(1500);
-        stopDrive();
-
+    public int findTicks(double distance){
+        return (int) (2 * ANDYMARK_TICKS_PER_REV * distance / Inches_per_Rotation);
     }
 
     public void forward(double val) {
@@ -96,32 +104,32 @@ public class EncoderTest extends LinearOpMode {
 
     public void driveForwardDistance(double power, int distance)
     {
-        frontRightDrive.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-        frontLeftDrive.setMode(DcMotorController. RunMode.RESET_ENCODERS);
+        //frontRightDrive.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+        //frontLeftDrive.setMode(DcMotorController. RunMode.RESET_ENCODERS);
         backLeftDrive.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         backRightDrive.setMode(DcMotorController.RunMode.RESET_ENCODERS);
 
-        frontLeftDrive.setTargetPosition(distance);
-        frontRightDrive.setTargetPosition(distance);
+        //frontLeftDrive.setTargetPosition(distance);
+        //frontRightDrive.setTargetPosition(distance);
         backLeftDrive.setTargetPosition(distance);
         backRightDrive.setTargetPosition(distance);
 
-        frontLeftDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-        frontRightDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        //frontLeftDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
+        //frontRightDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         backLeftDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
         backRightDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
 
         forward(power);
 
-        while(backLeftDrive.isBusy() && backRightDrive.isBusy() && frontLeftDrive.isBusy() && frontRightDrive.isBusy()){
+        while(backLeftDrive.isBusy() && backRightDrive.isBusy()){
 
         }
 
         stopDrive();
         backLeftDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         backRightDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        frontLeftDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        frontRightDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        //frontLeftDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        //frontRightDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
     }
 
     public void turnLeftDistance(double power, int distance)

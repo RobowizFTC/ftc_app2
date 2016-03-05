@@ -58,6 +58,8 @@ public class FtcOpModeRegister implements OpModeRegister {
       manager.register("VisionTest", BasicVisionSample.class);
       manager.register("LightTest", BasicLightSample.class);
       manager.register("Accel", AccelerometerComponent.class);
+      manager.register("Encoders", EncoderTest.class);
+      manager.register("navXRotateToAnglePIDLoopOp", navXRotateToAnglePIDLoopOp.class);
 //    manager.register("NullOp", NullOp.class);
 //
 //    //manager.register("MatrixK9TeleOp", MatrixK9TeleOp.class);
