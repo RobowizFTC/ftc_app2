@@ -47,5 +47,4 @@ dependencies {
     compile(name: 'WirelessP2p-release', ext: 'aar')
     compile project(':ftc-visionlib')
     compile project(':opencv-java')
-    compile (name:'navx_ftc-release', ext:'aar')
 }

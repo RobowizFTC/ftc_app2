@@ -18,8 +18,9 @@ public class TankDriveTapeTest extends OpMode{
     DcMotor tapeLeft;
     Servo adjust;
     //Servo deposit;
-    Servo safe;
-    // Servo allClear;
+    // Servo safe;
+    Servo allClearLeft;
+    Servo allClearRight;
     boolean reversed = false;
     boolean rightExtended = false;
     boolean leftExtended = false;
@@ -51,11 +52,15 @@ public class TankDriveTapeTest extends OpMode{
         climberRight = hardwareMap.servo.get("climberRight");
         tapeRight = hardwareMap.dcMotor.get("tapeRight");
         tapeLeft = hardwareMap.dcMotor.get("tapeLeft");
+        tapeLeft.setDirection(DcMotor.Direction.REVERSE);
         adjust = hardwareMap.servo.get("adjust");
         middle = hardwareMap.servo.get("middle");
-        //deposit = hardwareMap.servo.get("deposit");
-        safe = hardwareMap.servo.get("safe");
-        // allClear = hardwareMap.servo.get("clear");
+        // deposit = hardwareMap.servo.get("deposit");
+        // safe = hardwareMap.servo.get("safe");
+        allClearLeft = hardwareMap.servo.get("allClearLeft");
+        allClearRight = hardwareMap.servo.get("allClearRight");
+        allClearLeft.setPosition(Servo.MIN_POSITION);
+        allClearRight.setPosition(Servo.MIN_POSITION);
     }
 
     @Override
@@ -112,7 +117,8 @@ public class TankDriveTapeTest extends OpMode{
 //        }
 //
         if (gamepad1.dpad_up) {
-            safe.setPosition(Servo.MAX_POSITION);
+            allClearLeft.setPosition(Servo.MAX_POSITION);
+            allClearRight.setPosition(Servo.MAX_POSITION);
         }
 
         if (gamepad1.b){
@@ -138,7 +144,8 @@ public class TankDriveTapeTest extends OpMode{
         }
 
         else if(gamepad1.dpad_down) {
-            safe.setPosition(Servo.MIN_POSITION);
+            allClearLeft.setPosition(Servo.MIN_POSITION);
+            allClearRight.setPosition(Servo.MIN_POSITION);
         }
 //
 //        if (gamepad1.x) {
