@@ -53,8 +53,10 @@ import java.text.DecimalFormat;
  * for the navX-Model sensor should be used.
  */
 public class navXRotateToAnglePIDLoopOp extends OpMode {
-    DcMotor leftMotor;
-    DcMotor rightMotor;
+    DcMotor backLeftDrive;
+    DcMotor backRightDrive;
+    DcMotor frontLeftDrive;
+    DcMotor frontRightDrive;
 
     /* This is the port on the Core Device Interface Module        */
     /* in which the navX-Model Device is connected.  Modify this  */
@@ -81,20 +83,23 @@ public class navXRotateToAnglePIDLoopOp extends OpMode {
 
     @Override
     public void init() {
-        leftMotor = hardwareMap.dcMotor.get("backLeftDrive");
-        rightMotor = hardwareMap.dcMotor.get("backRightDrive");
-
+        backLeftDrive = hardwareMap.dcMotor.get("backLeftDrive");
+        frontLeftDrive = hardwareMap.dcMotor.get("frontLeftDrive");
+        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        backRightDrive = hardwareMap.dcMotor.get("backRightDrive");
+        frontRightDrive = hardwareMap.dcMotor.get("frontRightDrive");
         navx_device = AHRS.getInstance(hardwareMap.deviceInterfaceModule.get("dim"),
                 NAVX_DIM_I2C_PORT,
                 AHRS.DeviceDataType.kProcessedData,
                 NAVX_DEVICE_UPDATE_RATE_HZ);
 
-        rightMotor.setDirection(DcMotor.Direction.REVERSE);
+        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
 
         /* If possible, use encoders when driving, as it results in more */
         /* predictable drive system response.                           */
-        //leftMotor.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        //rightMotor.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        //backLeftDrive.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        //backRightDrive.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
 
         /* Create a PID Controller which uses the Yaw Angle as input. */
         yawPIDController = new navXPIDController( navx_device,
@@ -137,13 +142,17 @@ public class navXRotateToAnglePIDLoopOp extends OpMode {
              */
             if (yawPIDController.isNewUpdateAvailable(yawPIDResult)) {
                 if (yawPIDResult.isOnTarget()) {
-                    leftMotor.setPowerFloat();
-                    rightMotor.setPowerFloat();
+                    backLeftDrive.setPowerFloat();
+                    backRightDrive.setPowerFloat();
+                    frontLeftDrive.setPowerFloat();
+                    frontRightDrive.setPowerFloat();
                     telemetry.addData("Motor Output", df.format(0.00));
                 } else {
                     double output = yawPIDResult.getOutput();
-                    leftMotor.setPower(output);
-                    rightMotor.setPower(-output);
+                    backLeftDrive.setPower(output);
+                    backRightDrive.setPower(output);
+                    frontLeftDrive.setPower(output);
+                    frontRightDrive.setPower(output);
                     telemetry.addData("Motor Output", df.format(output) + ", " +
                             df.format(-output));
                 }
