@@ -60,6 +60,7 @@ public class FtcOpModeRegister implements OpModeRegister {
       manager.register("Accel", AccelerometerComponent.class);
       manager.register("Encoders", EncoderTest.class);
       manager.register("Straight Line", navXRotateToAnglePIDLoopOp.class);
+      manager.register("Line Follow", K9Line.class);
 //    manager.register("NullOp", NullOp.class);
 //
 //    //manager.register("MatrixK9TeleOp", MatrixK9TeleOp.class);

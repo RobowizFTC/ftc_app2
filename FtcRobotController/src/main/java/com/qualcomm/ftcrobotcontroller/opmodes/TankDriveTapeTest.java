@@ -16,7 +16,8 @@ public class TankDriveTapeTest extends OpMode{
     Servo middle;
     DcMotor tapeRight;
     DcMotor tapeLeft;
-    Servo adjust;
+    Servo adjustLeft;
+    Servo adjustRight;
     //Servo deposit;
     // Servo safe;
     Servo allClearLeft;
@@ -53,7 +54,8 @@ public class TankDriveTapeTest extends OpMode{
         tapeRight = hardwareMap.dcMotor.get("tapeRight");
         tapeLeft = hardwareMap.dcMotor.get("tapeLeft");
         tapeLeft.setDirection(DcMotor.Direction.REVERSE);
-        adjust = hardwareMap.servo.get("adjust");
+        adjustLeft = hardwareMap.servo.get("adjustLeft");
+        adjustRight = hardwareMap.servo.get("adjustRight");
         middle = hardwareMap.servo.get("middle");
         // deposit = hardwareMap.servo.get("deposit");
         // safe = hardwareMap.servo.get("safe");
@@ -154,11 +156,11 @@ public class TankDriveTapeTest extends OpMode{
 //                pos = 0.01;
 //            deposit.setPosition(pos);
 //        }
-        if (gamepad1.right_trigger >= .3) {
+        if (gamepad2.right_bumper) {
             tapeRight.setPower(.5);
         }
 
-        else if (gamepad1.left_trigger >= .3) {
+        else if (gamepad2.left_bumper) {
             tapeRight.setPower(-.95);
         }
 
@@ -167,16 +169,10 @@ public class TankDriveTapeTest extends OpMode{
         }
 
         if (gamepad1.right_bumper) {
-//            if (adjust.getPosition() < 0.99) {
-//                adjust.setPosition(adjust.getPosition() + 0.01);
-//            }
             tapeLeft.setPower(0.5);
         }
 
         else if (gamepad1.left_bumper) {
-//            if (adjust.getPosition() > 0.01) {
-//                adjust.setPosition(adjust.getPosition() - 0.01);
-//            }
             tapeLeft.setPower(-0.95);
         }
         else {
@@ -184,14 +180,26 @@ public class TankDriveTapeTest extends OpMode{
         }
 
         if(gamepad1.a){
-            if (adjust.getPosition() < 0.99) {
-                adjust.setPosition(adjust.getPosition() + 0.01);
+            if (adjustRight.getPosition() < 0.99) {
+                adjustRight.setPosition(adjustRight.getPosition() + 0.01);
             }
         }
 
         if ((gamepad1.y)){
-            if (adjust.getPosition() > 0.01) {
-                adjust.setPosition(adjust.getPosition() - 0.01);
+            if (adjustRight.getPosition() > 0.01) {
+                adjustRight.setPosition(adjustRight.getPosition() - 0.01);
+            }
+        }
+
+        if(gamepad2.a){
+            if (adjustLeft.getPosition() < 0.99) {
+                adjustLeft.setPosition(adjustLeft.getPosition() + 0.01);
+            }
+        }
+
+        if ((gamepad2.y)){
+            if (adjustLeft.getPosition() > 0.01) {
+                adjustLeft.setPosition(adjustLeft.getPosition() - 0.01);
             }
         }
 

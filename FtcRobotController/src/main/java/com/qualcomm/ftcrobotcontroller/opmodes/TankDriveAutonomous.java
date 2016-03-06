@@ -47,6 +47,7 @@ public class TankDriveAutonomous extends LinearOpMode {
     LightSensor light;
     OpticalDistanceSensor ods;
     TouchSensor touch;
+    final int LIGHT_THRESHOLD = 800;
 
     // variables for converting inches to ticks
 
@@ -219,6 +220,8 @@ public class TankDriveAutonomous extends LinearOpMode {
 
         waitForStart();
 
+        // if light sensor > 800; detecting ground
+        // if light sensor < 800; detecting line
 
 
     }

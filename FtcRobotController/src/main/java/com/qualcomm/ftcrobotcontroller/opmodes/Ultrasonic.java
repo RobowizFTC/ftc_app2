@@ -35,14 +35,13 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.LegacyModule;
 import com.qualcomm.robotcore.hardware.LightSensor;
-import com.qualcomm.robotcore.hardware.Servo;
 
 /**
  * TeleOp Mode
  * <p>
  * Enables control of the robot via the gamepad
  */
-public class K9Line extends OpMode {
+public class Ultrasonic extends OpMode {
 
 	final static double MOTOR_POWER = 0.15; // Higher values will cause the robot to move faster
 	final static double HOLD_IR_SIGNAL_STRENGTH = 0.20; // Higher values will cause the robot to follow closer
@@ -53,7 +52,7 @@ public class K9Line extends OpMode {
 	DcMotor backRightDrive;
 //	DcMotor frontRightDrive;
     LegacyModule legacy;
-	
+
 	// Servo claw;
 	// Servo arm;
 	LightSensor ls;
@@ -61,7 +60,7 @@ public class K9Line extends OpMode {
 	/**
 	 * Constructor
 	 */
-	public K9Line() {
+	public Ultrasonic() {
 
 	}
 
