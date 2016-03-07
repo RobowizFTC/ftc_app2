@@ -127,32 +127,6 @@ public class PushBotHardware extends OpMode
         //
         double l_hand_position = 0.5;
 
-        try
-        {
-            v_servo_left_hand = hardwareMap.servo.get ("left_hand");
-            v_servo_left_hand.setPosition (l_hand_position);
-        }
-        catch (Exception p_exeception)
-        {
-            m_warning_message ("left_hand");
-            DbgLog.msg (p_exeception.getLocalizedMessage ());
-
-            v_servo_left_hand = null;
-        }
-
-        try
-        {
-            v_servo_right_hand = hardwareMap.servo.get ("right_hand");
-            v_servo_right_hand.setPosition (l_hand_position);
-        }
-        catch (Exception p_exeception)
-        {
-            m_warning_message ("right_hand");
-            DbgLog.msg (p_exeception.getLocalizedMessage ());
-
-            v_servo_right_hand = null;
-        }
-
     } // init
 
     //--------------------------------------------------------------------------
