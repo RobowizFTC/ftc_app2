@@ -55,11 +55,11 @@ public class FtcOpModeRegister implements OpModeRegister {
      * If two or more op modes are registered with the same name, the app will display an error.
      */
       manager.register("Tele-Op", TankDriveTapeTest.class);
-      manager.register("VisionTest", BasicVisionSample.class);
+      //manager.register("VisionTest", BasicVisionSample.class);
       manager.register("LightTest", BasicLightSample.class);
-      manager.register("Accel", AccelerometerComponent.class);
+      //manager.register("Accel", AccelerometerComponent.class);
       manager.register("Encoders", EncoderTest2.class);
-      manager.register("Straight Line", navXRotateToAnglePIDLoopOp.class);
+      manager.register("Turn90", navXRotateToAnglePIDLoopOp.class);
       manager.register("Line Follow", K9Line.class);
 //    manager.register("NullOp", NullOp.class);
 //

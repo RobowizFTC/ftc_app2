@@ -69,7 +69,7 @@ public class navXRotateToAnglePIDLoopOp extends OpMode {
     private final byte NAVX_DEVICE_UPDATE_RATE_HZ = 50;
 
     private final double TARGET_ANGLE_DEGREES = 90.0;
-    private final double TOLERANCE_DEGREES = 2.0;
+    private final double TOLERANCE_DEGREES = 5.0;
     private final double MIN_MOTOR_OUTPUT_VALUE = -1.0;
     private final double MAX_MOTOR_OUTPUT_VALUE = 1.0;
     private final double YAW_PID_P = 0.005;
@@ -87,19 +87,22 @@ public class navXRotateToAnglePIDLoopOp extends OpMode {
         frontLeftDrive = hardwareMap.dcMotor.get("frontLeftDrive");
         backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+
         backRightDrive = hardwareMap.dcMotor.get("backRightDrive");
         frontRightDrive = hardwareMap.dcMotor.get("frontRightDrive");
+        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
         navx_device = AHRS.getInstance(hardwareMap.deviceInterfaceModule.get("dim"),
                 NAVX_DIM_I2C_PORT,
                 AHRS.DeviceDataType.kProcessedData,
                 NAVX_DEVICE_UPDATE_RATE_HZ);
 
-        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+
 
         /* If possible, use encoders when driving, as it results in more */
         /* predictable drive system response.                           */
-        //backLeftDrive.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        //backRightDrive.setChannelMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        backLeftDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        backRightDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
 
         /* Create a PID Controller which uses the Yaw Angle as input. */
         yawPIDController = new navXPIDController( navx_device,

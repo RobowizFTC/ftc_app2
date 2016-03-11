@@ -61,8 +61,8 @@ public class TankDriveTapeTest extends OpMode{
         tapeLeft = hardwareMap.dcMotor.get("tapeLeft");
         tapeLeft.setDirection(DcMotor.Direction.REVERSE);
 
-        //climberLeft = hardwareMap.servo.get("climberLeft");
-        //climberRight = hardwareMap.servo.get("climberRight");
+        climberLeft = hardwareMap.servo.get("climberLeft");
+        climberRight = hardwareMap.servo.get("climberRight");
 
         leftAdjust = hardwareMap.servo.get("leftAdjust");
         rightAdjust = hardwareMap.servo.get("rightAdjust");
@@ -72,11 +72,10 @@ public class TankDriveTapeTest extends OpMode{
         deposit = hardwareMap.servo.get("deposit");
         depositTilt = hardwareMap.servo.get("depositTilt");
 
-        //allClearLeft = hardwareMap.servo.get("allClearLeft");
-        //allClearLeft.setPosition(Servo.MIN_POSITION);
-
         allClearRight = hardwareMap.servo.get("allClearRight");
-        allClearRight.setPosition(Servo.MIN_POSITION);
+        allClearLeft = hardwareMap.servo.get("allClearLeft");
+        allClearRight.setPosition(0.5);
+        allClearLeft.setPosition(0.5);
     }
 
     @Override
@@ -114,31 +113,28 @@ public class TankDriveTapeTest extends OpMode{
 
 
         // update the position of the climberServo.
-//        if (gamepad1.y) {                             //Controls for Climber Servos
-//            // if the Y button is pushed on gamepad1, increment the position of
-//            // the climberServo servo.
-//            climber.setPosition(Servo.MIN_POSITION * .75);
-//        }
-//
-//        if (gamepad1.a) {
-//            // if the A button is pushed on gamepad1, decrease the position of
-//            // the climberServo servo.
-//            climber.setPosition(Servo.MAX_POSITION * .95);
-//        }
-//        if (gamepad1.b) {
-//            pos = deposit.getPosition() + .1;
-//            if (pos > 1)
-//                pos = .99;
-//            deposit.setPosition(pos);
-//        }
-//
+        if (gamepad1.y) {                             //Controls for Climber Servos
+            // if the Y button is pushed on gamepad1, increment the position of
+            // the climberServo servo.
+            climberRight.setPosition(Servo.MIN_POSITION * .75);
+            climberLeft.setPosition(Servo.MIN_POSITION * .75);
+        }
+
+        if (gamepad1.a) {
+            // if the A button is pushed on gamepad1, decrease the position of
+            // the climberServo servo.
+            climberRight.setPosition(Servo.MAX_POSITION * .95);
+            climberLeft.setPosition(Servo.MAX_POSITION * .95);
+        }
+
+
         if (gamepad1.dpad_up) {                     //All Clear Controls
-            //allClearLeft.setPosition(Servo.MAX_POSITION);
+            allClearLeft.setPosition(Servo.MIN_POSITION);
             allClearRight.setPosition(Servo.MAX_POSITION);
         }
 
         else if(gamepad1.dpad_down) {
-            //allClearLeft.setPosition(Servo.MIN_POSITION);
+            allClearLeft.setPosition(Servo.MAX_POSITION);
             allClearRight.setPosition(Servo.MIN_POSITION);
         }
 
@@ -275,6 +271,14 @@ public class TankDriveTapeTest extends OpMode{
 
     @Override
     public void stop() {
+        allClearLeft.close();
+        allClearRight.close();
+        climberLeft.close();
+        climberRight.close();
+        leftAdjust.close();
+        rightAdjust.close();
+        middle.close();
+        depositTilt.close();
     }
 
     /*

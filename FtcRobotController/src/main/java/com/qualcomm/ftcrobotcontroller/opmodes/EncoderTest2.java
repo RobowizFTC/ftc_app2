@@ -134,6 +134,8 @@ public class EncoderTest2 extends LinearOpMode
             telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
         }
 
+
+
 //        while(LeftF.getCurrentPosition() < 1000);
 //        {
 //            LeftF.setPower(0.5);
