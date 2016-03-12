@@ -4,39 +4,117 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.kauailabs.navx.ftc.AHRS;
+import com.kauailabs.navx.ftc.navXPIDController;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.LegacyModule;
+import com.qualcomm.robotcore.hardware.LightSensor;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.UltrasonicSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class EncoderTest2 extends LinearOpMode
-{
+import java.text.DecimalFormat;
+
+
+public class EncoderTest2 extends LinearOpMode {
     DcMotor RightF;
     DcMotor RightR;
     DcMotor LeftF;
     DcMotor LeftR;
-    DcMotor Sweeper;
-
+    Servo deposit;
+    Servo depositTilt;
+    Servo middle;
+    LightSensor lsL;
+    LightSensor lsR;
+    UltrasonicSensor ultraL;
+    UltrasonicSensor ultraR;
+    LegacyModule legacy;
     double pulses = 1680;
     double circumference = 13.5;
 
-    public int getTicks(double inches){
+    private final int NAVX_DIM_I2C_PORT = 0;
+    private AHRS navx_device;
+    private navXPIDController yawPIDController;
+    private ElapsedTime runtime = new ElapsedTime();
+
+    private final byte NAVX_DEVICE_UPDATE_RATE_HZ = 50;
+
+    private final double TARGET_ANGLE_DEGREES = 80.0;
+    private final double TOLERANCE_DEGREES = 5.0;
+    private final double MIN_MOTOR_OUTPUT_VALUE = -1.0;
+    private final double MAX_MOTOR_OUTPUT_VALUE = 1.0;
+    private final double YAW_PID_P = 0.005;
+    private final double YAW_PID_I = 0.0;
+    private final double YAW_PID_D = 0.0;
+
+    private boolean calibration_complete = false;
+
+    navXPIDController.PIDResult yawPIDResult;
+    DecimalFormat df;
+
+    public int getTicks(double inches) {
         return (int) (2 * inches / circumference * pulses);
 
     }
 
     @Override
-    public void runOpMode() throws InterruptedException
-    {
+    public void runOpMode() throws InterruptedException {
         RightR = hardwareMap.dcMotor.get("backRightDrive");
         RightR.setDirection(DcMotor.Direction.REVERSE);
         RightF = hardwareMap.dcMotor.get("frontRightDrive");
         RightF.setDirection(DcMotor.Direction.REVERSE);
         LeftR = hardwareMap.dcMotor.get("backLeftDrive");
         LeftF = hardwareMap.dcMotor.get("frontLeftDrive");
+        deposit = hardwareMap.servo.get("deposit");
+        depositTilt = hardwareMap.servo.get("depositTilt");
+        middle = hardwareMap.servo.get("middle");
+        middle.setPosition(0.5);
+//        legacy = hardwareMap.legacyModule.get("legacy");
+
+        // spooky sensors
+
+//        ultraL = hardwareMap.ultrasonicSensor.get("ultraL"); // legacy
+//        ultraR = hardwareMap.ultrasonicSensor.get("ultraR"); // legacy
+//        legacy.enable9v(4, true);
+//        legacy.enable9v(5, true); // enable the ports for the ULTRASONICS
+//        lsL = hardwareMap.lightSensor.get("lsL"); // left side Light sensor
+//        lsR = hardwareMap.lightSensor.get("lsR"); // right side Light sensor
+
+
+
+
+        navx_device = AHRS.getInstance(hardwareMap.deviceInterfaceModule.get("dim"),
+                NAVX_DIM_I2C_PORT,
+                AHRS.DeviceDataType.kProcessedData,
+                NAVX_DEVICE_UPDATE_RATE_HZ);
 
         telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
+
+        yawPIDController = new navXPIDController(navx_device,
+                navXPIDController.navXTimestampedDataSource.YAW);
+
+        /* Configure the PID controller */
+        yawPIDController.setSetpoint(TARGET_ANGLE_DEGREES);
+        yawPIDController.setContinuous(true);
+        yawPIDController.setOutputRange(MIN_MOTOR_OUTPUT_VALUE, MAX_MOTOR_OUTPUT_VALUE);
+        yawPIDController.setTolerance(navXPIDController.ToleranceType.ABSOLUTE, TOLERANCE_DEGREES);
+        yawPIDController.setPID(YAW_PID_P, YAW_PID_I, YAW_PID_D);
+
+        df = new DecimalFormat("#.##");
 
         LeftF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         LeftR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         RightF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
         RightR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+
+        navx_device.zeroYaw();
+        yawPIDResult = new navXPIDController.PIDResult();
+
+        deposit.setPosition(Servo.MAX_POSITION);
+        depositTilt.setPosition(Servo.MIN_POSITION);
 
         waitForStart();
 
@@ -46,13 +124,10 @@ public class EncoderTest2 extends LinearOpMode
         RightF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         RightR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
-
-        //waitForStart();
-
-        int ticks = getTicks(40);                                                   //Out 2.5ish tiles
-
-        while(LeftR.getCurrentPosition() < ticks)
-        {
+//
+        int ticks = getTicks(50);                                                   //Out 2.5ish tiles
+//
+        while (LeftR.getCurrentPosition() < ticks) {
             LeftF.setPower(0.95);
             LeftR.setPower(0.95);
             RightF.setPower(0.95);
@@ -66,37 +141,7 @@ public class EncoderTest2 extends LinearOpMode
         RightR.setPower(0);
         telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
 
-
-        while(LeftF.getCurrentPosition() > 5)
-        {
-            LeftF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-            LeftR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-            RightF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-            RightR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-            telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
-        }
-
-//
-        RightF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        RightR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//
-        ticks = getTicks(25.132);                                                   //Turn about 70 degrees
-        while(RightR.getCurrentPosition() < ticks)
-        {
-
-            LeftF.setPower(0);
-            LeftR.setPower(0);
-            RightF.setPower(0.95);
-            RightR.setPower(0.95);
-            telemetry.addData("RightF Position", RightF.getCurrentPosition());
-        }
-
-        LeftF.setPower(0);
-        LeftR.setPower(0);
-        RightF.setPower(0);
-        RightR.setPower(0);
-        while(RightR.getCurrentPosition() > 5)
-        {
+        while (LeftF.getCurrentPosition() > 5) {
             LeftF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
             LeftR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
             RightF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
@@ -108,31 +153,231 @@ public class EncoderTest2 extends LinearOpMode
         LeftR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         RightF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         RightR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-        telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
 
+        /////////////////Turn 70 Degrees///////////////////
+        LeftF.setDirection(DcMotor.Direction.REVERSE);
+        LeftR.setDirection(DcMotor.Direction.REVERSE);
+        navx_device = AHRS.getInstance(hardwareMap.deviceInterfaceModule.get("dim"),
+                NAVX_DIM_I2C_PORT,
+                AHRS.DeviceDataType.kProcessedData,
+                NAVX_DEVICE_UPDATE_RATE_HZ);
 
-        ticks = getTicks(50);                                                   //Get in the vicinity of the zone
-        while(RightF.getCurrentPosition() < ticks)
-        {
-            LeftF.setPower(0.95);
-            LeftR.setPower(0.95);
-            RightF.setPower(0.95);
-            RightR.setPower(0.95);
+//        while ( !calibration_complete ) {
+//            /* navX-Micro Calibration completes automatically ~15 seconds after it is
+//            powered on, as long as the device is still.  To handle the case where the
+//            navX-Micro has not been able to calibrate successfully, hold off using
+//            the navX-Micro Yaw value until calibration is complete.
+//             */
+//            calibration_complete = !navx_device.isCalibrating();
+//            if ( calibration_complete ) {
+//                navx_device.zeroYaw();
+//                telemetry.addData("navX-Micro", "worked");
+//            } else {
+//
+//                sleep(200);
+//            }
+//        }
+        while (!calibration_complete) {
+            /* navX-Micro Calibration completes automatically ~15 seconds after it is
+            powered on, as long as the device is still.  To handle the case where the
+            navX-Micro has not been able to calibrate successfully, hold off using
+            the navX-Micro Yaw value until calibration is complete.
+             */
+            calibration_complete = !navx_device.isCalibrating();
+            if (!calibration_complete) {
+                telemetry.addData("navX-Micro", "Startup Calibration in Progress");
+            }
+        }
+        navx_device.zeroYaw();
+        yawPIDController.enable(true);
+        boolean turning = true;
+        telemetry.addData("Initial Yaw", navx_device.getYaw());
+        while (turning) {
+            if (yawPIDController.isNewUpdateAvailable(yawPIDResult)) {
+                if (yawPIDResult.isOnTarget()) {
+                    LeftR.setPowerFloat();
+                    RightR.setPowerFloat();
+                    LeftF.setPowerFloat();
+                    RightF.setPowerFloat();
+                    telemetry.addData("Motor Output", "made it!!!!");
+                    turning = false;
+                } else {
+                    double output = yawPIDResult.getOutput();
+                    LeftR.setPower(output);
+                    RightR.setPower(output);
+                    LeftF.setPower(output);
+                    RightF.setPower(output);
+                    telemetry.addData("Yaw", navx_device.getYaw());
+                }
+            }
         }
 
-        LeftF.setPower(0);
-        LeftR.setPower(0);
-        RightF.setPower(0);
-        RightR.setPower(0);
-
-        while(RightF.getCurrentPosition() > 5)
-        {
+        while (LeftF.getCurrentPosition() > 5) {
             LeftF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
             LeftR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
             RightF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
             RightR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
             telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
         }
+
+        LeftF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        LeftR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        RightF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        RightR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+
+
+        telemetry.addData("While Loop", "Over");
+////         use straight line driving to move 50 ticks
+
+        LeftF.setDirection(DcMotor.Direction.FORWARD);
+        LeftR.setDirection(DcMotor.Direction.FORWARD);
+
+        double leftDrive;
+        double rightDrive;
+
+        sleep(200);
+        double drive_speed = 0.95;
+        ticks = getTicks(40);
+        while (RightF.getCurrentPosition() < ticks) {
+            if (yawPIDController.isNewUpdateAvailable(yawPIDResult)) {
+                if (yawPIDResult.isOnTarget()) {
+                    LeftF.setPower(drive_speed);
+                    RightF.setPower(drive_speed);
+                    LeftR.setPower(drive_speed);
+                    RightR.setPower(drive_speed);
+                } else {
+                    double output = yawPIDResult.getOutput();
+                    leftDrive = drive_speed + output;
+                    rightDrive = drive_speed - output;
+
+
+                    if (leftDrive > .95)
+                        leftDrive = .95;
+
+                    if (leftDrive < -.95)
+                        leftDrive = -.95;
+
+                    if (rightDrive > .95)
+                        rightDrive = .95;
+
+                    if (rightDrive < -.95)
+                        rightDrive = -.95;
+
+                    telemetry.addData("LMotor: ", leftDrive);
+                    telemetry.addData("RMotor: ", rightDrive);
+
+                    LeftF.setPower(leftDrive);
+                    LeftR.setPower(leftDrive);
+                    RightF.setPower(rightDrive);
+                    RightR.setPower(rightDrive);
+                }
+
+            }
+        }
+
+        // theoretically should be in the vicinity of the line
+
+//        double distanceL = ultraL.getUltrasonicLevel();
+//        double distanceR = ultraR.getUltrasonicLevel();
+//        final double LIGHT_THRESHOLD = .5;
+//        double output = .8;
+//        while (distanceL > 50 && distanceR > 50) {
+//            // line follow
+//            double lightRight = lsR.getLightDetected();
+//            double lightLeft = lsL.getLightDetected();
+//            while (lightRight < LIGHT_THRESHOLD || lightLeft < LIGHT_THRESHOLD) {
+//
+//                if (lightRight < LIGHT_THRESHOLD) {
+//                    LeftF.setPower(-output);
+//                    LeftR.setPower(-output);
+//                    RightF.setPower(output);
+//                    RightR.setPower(output);
+//                    lightRight = lsR.getLightDetected();
+//                }
+//
+//                if (lightLeft < LIGHT_THRESHOLD) {
+//                    LeftF.setPower(output);
+//                    LeftR.setPower(output);
+//                    RightF.setPower(-output);
+//                    RightR.setPower(-output);
+//                    lightLeft = lsL.getLightDetected();
+//                }
+//
+//            }
+//
+//            distanceL = ultraL.getUltrasonicLevel();
+//            distanceR = ultraR.getUltrasonicLevel();
+//            telemetry.addData("UltraR: ", distanceR);
+//            telemetry.addData("UltraL: ", distanceL);
+//
+//        }
+
+        telemetry.addData("finished", "finished");
+
+        LeftR.setPower(0);
+        LeftF.setPower(0);
+        RightR.setPower(0);
+        RightF.setPower(0);
+        telemetry.addData("stopped", "stopped");
+        sleep(1000);
+        deposit.setPosition(Servo.MIN_POSITION);
+        sleep(1000);
+        depositTilt.setPosition(Servo.MAX_POSITION);
+        sleep(1000);
+        depositTilt.setPosition(Servo.MIN_POSITION);
+        sleep(1000);
+        deposit.setPosition(Servo.MAX_POSITION);
+        sleep(1000);
+
+    }
+
+}
+
+//        LeftF.setDirection(DcMotor.Direction.FORWARD);
+//        LeftR.setDirection(DcMotor.Direction.FORWARD);
+//
+//        LeftF.setPower(0);
+//        LeftR.setPower(0);
+//        RightF.setPower(0);
+//        RightR.setPower(0);
+//        while(RightR.getCurrentPosition() > 5)
+//        {
+//            LeftF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+//            LeftR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+//            RightF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+//            RightR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+//            telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
+//        }
+//
+//        LeftF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+//        LeftR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+//        RightF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+//        RightR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+//        telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
+//
+//
+//        ticks = getTicks(50);                                                   //Get in the vicinity of the zone
+//        while(RightF.getCurrentPosition() < ticks)
+//        {
+//            LeftF.setPower(0.95);
+//            LeftR.setPower(0.95);
+//            RightF.setPower(0.95);
+//            RightR.setPower(0.95);
+//        }
+//
+//        LeftF.setPower(0);
+//        LeftR.setPower(0);
+//        RightF.setPower(0);
+//        RightR.setPower(0);
+//
+//        while(RightF.getCurrentPosition() > 5)
+//        {
+//            LeftF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+//            LeftR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+//            RightF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+//            RightR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+//            telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
+//        }
 
 
 
@@ -292,336 +537,3 @@ public class EncoderTest2 extends LinearOpMode
 //        RightF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
 //        RightR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
 //        telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
-    }
-}
-
-
-
-
-//package com.qualcomm.ftcrobotcontroller.opmodes;
-//
-//import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-//import com.qualcomm.robotcore.hardware.DcMotor;
-//import com.qualcomm.robotcore.hardware.DcMotorController;
-//import com.qualcomm.robotcore.util.ElapsedTime;
-//import com.qualcomm.robotcore.util.Range;
-//
-//import java.text.SimpleDateFormat;
-//import java.util.Date;
-//
-///**
-// * Created by bk on 9/21/2015.
-// */
-//public class EncoderTest2 extends OpMode {
-//    private String            startDate;
-//    private ElapsedTime runTime = new ElapsedTime();
-//
-//
-//    DcMotor frontLeftDrive;
-//    DcMotor frontRightDrive;
-//    DcMotor backLeftDrive;
-//    DcMotor backRightDrive;
-//
-//    public EncoderTest2() {
-//
-//    }
-//
-//    @Override public void init() {
-//        startDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
-//
-//        backRightDrive = hardwareMap.dcMotor.get("backRightDrive");
-//        backLeftDrive = hardwareMap.dcMotor.get("backLeftDrive");
-//        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-//
-//        frontRightDrive = hardwareMap.dcMotor.get("frontRightDrive");
-//        frontLeftDrive = hardwareMap.dcMotor.get("frontLeftDrive");
-//        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-//
-//        // The strings must match names given in Settings->Configure Robot
-//
-//
-//        // Do not do RESET_ENCODERS and RUN_WITHOUT_ENCODERS
-//        // If you do - it will not run.
-////        setDriveMode(DcMotorController.RunMode.RESET_ENCODERS);
-//        setDriveMode(DcMotorController.RunMode.RUN_WITHOUT_ENCODERS);
-//        setDrivePower(0.0, 0.0);
-//
-//        runTime.reset();
-//    }
-//
-//    @Override public void loop() {
-//        // Negative is up on the joystick,
-//        // Positive is down on the joystick,
-//        // Send the "negative" of the joystick so up is now positive
-//        setDrivePower(-gamepad1.left_stick_y,-gamepad1.right_stick_y);
-//
-//        telemetry.addData("1 Motor 1", backRightDrive.getCurrentPosition());
-//        telemetry.addData("2 Motor 2", backLeftDrive.getCurrentPosition());
-//    }
-//
-//    @Override public void stop() {
-//        setDrivePower(0.0, 0.0);
-//    }
-//
-//    /**
-//     * Set the power to left and right motors, the values must range
-//     * between -1 and 1.
-//     * @param left
-//     * @param right
-//     */
-//    public void setDrivePower(double left, double right) {
-//        // This assumes power is given as -1 to 1
-//        // The range clip will make sure it is between -1 and 1
-//        // An incorrect value can cause the program to exception
-//        backLeftDrive.setPower(Range.clip(left, -1.0, 1.0));
-//        backRightDrive.setPower(Range.clip(right, -1.0, 1.0));
-//    }
-//
-//
-//    /**
-//     * Sets the drive mode for each motor.
-//     * The types of Run Modes are
-//     *   DcMotorController.RunMode.RESET_ENCODERS
-//     *      Resets the Encoder Values to 0
-//     *   DcMotorController.RunMode.RUN_TO_POSITION
-//     *      Runs until the encoders are equal to the target position
-//     *   DcMotorController.RunMode.RUN_USING_ENCODERS
-//     *      Attempts to keep the robot running straight utilizing
-//     *      the PID the reduces the maximum power by about 15%
-//     *   DcMotorController.RunMode.RUN_WITHOUT_ENCODERS
-//     *      Applies the power directly
-//     * @param mode
-//     */
-//    public void setDriveMode(DcMotorController.RunMode mode) {
-//        if (backLeftDrive.getChannelMode() != mode) {
-//            backLeftDrive.setChannelMode(mode);
-//        }
-//
-//        if (backRightDrive.getChannelMode() != mode) {
-//            backRightDrive.setChannelMode(mode);
-//        }
-//    }
-//}
-//
-//
-////
-////
-//////import android.hardware.Sensor;
-////
-////import com.qualcomm.robotcore.hardware.DcMotorController;
-////import com.qualcomm.robotcore.hardware.LegacyModule;
-////import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-////import com.qualcomm.robotcore.hardware.DcMotor;
-////import com.qualcomm.robotcore.hardware.LegacyModule;
-////import com.qualcomm.robotcore.hardware.Servo;
-////import com.qualcomm.robotcore.hardware.UltrasonicSensor;
-////
-////import android.content.Context;
-////import android.hardware.Sensor;
-////import android.hardware.SensorEvent;
-////import android.hardware.SensorEventListener;
-////import android.hardware.SensorManager;
-////
-////import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-////
-////import java.text.SimpleDateFormat;
-////import java.util.Date;
-////
-////
-////import java.util.UnknownFormatConversionException;
-////
-/////**
-//// * Start backwards and align with climber thing
-//// */
-////public class EncoderTest extends LinearOpMode {
-////
-////    DcMotor backLeftDrive;
-////    DcMotor backRightDrive;
-////    DcMotor frontLeftDrive;
-////    DcMotor frontRightDrive;
-////    DcMotor tape;
-////    Servo adjust;
-////    Servo deposit;
-////
-////    int ANDYMARK_TICKS_PER_REV = 1680;
-////    double Inches_per_Rotation = 13.125;
-////
-////    @Override public void runOpMode() throws InterruptedException{
-////        //Initialize hardware
-////        backLeftDrive = hardwareMap.dcMotor.get("backLeftDrive");
-////        backRightDrive = hardwareMap.dcMotor.get("backRightDrive");
-////        frontLeftDrive = hardwareMap.dcMotor.get("frontLeftDrive");
-////        frontRightDrive = hardwareMap.dcMotor.get("frontRightDrive");
-////        //tape = hardwareMap.dcMotor.get("tape");
-////
-////        //adjust = hardwareMap.servo.get("adjust");
-////        //deposit = hardwareMap.servo.get("deposit");
-////
-//////        backLeftDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//////        backRightDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//////        //frontLeftDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//////        //frontRightDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//////        //tape.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//////
-//////        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-//////        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-////
-////        //Wait for the game to start
-////        waitForStart();
-////
-////        //deposit.setPosition(Servo.MAX_POSITION);
-////
-//////        backwards(.5);
-//////        sleep(2500);
-//////        stopDrive();
-//////        sleep(250);
-//////
-//////        forward(.5);
-//////        sleep(700);
-//////        stopDrive();
-//////        sleep(250);
-//////
-//////        turnLeft(.5);
-//////        sleep(800);
-//////        stopDrive();
-//////        sleep(250);
-//////        forward(.75);
-//////        sleep(1500);
-//////        stopDrive();
-////
-////        //telemetry.addData("ticks", "" + findTicks(24));
-////        //driveForwardDistance(0.95,findTicks(24));
-////        stop();
-////
-////    }
-////
-////    public int findTicks(double distance){
-////        return (int) (2 * ANDYMARK_TICKS_PER_REV * distance / Inches_per_Rotation);
-////    }
-////
-////    public void forward(double val) {
-////
-////        frontLeftDrive.setPower(val);
-////        frontRightDrive.setPower(val);
-////        backLeftDrive.setPower(val);
-////        backRightDrive.setPower(val);
-////    }
-////
-////    public void driveForwardDistance(double power, int distance)
-////    {
-////        //frontRightDrive.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-////        //frontLeftDrive.setMode(DcMotorController. RunMode.RESET_ENCODERS);
-////        backLeftDrive.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-////        backRightDrive.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//////
-//////        //frontLeftDrive.setTargetPosition(distance);
-//////        //frontRightDrive.setTargetPosition(distance);
-//////        backLeftDrive.setTargetPosition(distance);
-//////        backRightDrive.setTargetPosition(distance);
-//////
-//////        //frontLeftDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-//////        //frontRightDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-//////        backLeftDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-//////        backRightDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-//////
-//////        forward(power);
-//////
-//////        while(backLeftDrive.isBusy() && backRightDrive.isBusy()){
-//////
-//////        }
-//////
-//////        stopDrive();
-//////        backLeftDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//////        backRightDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//////        //frontLeftDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//////        //frontRightDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-////
-////
-////    }
-////
-////    public void turnLeftDistance(double power, int distance)
-////    {
-////        frontRightDrive.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-////        frontLeftDrive.setMode(DcMotorController. RunMode.RESET_ENCODERS);
-////        backLeftDrive.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-////        backRightDrive.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-////
-////        frontLeftDrive.setTargetPosition(-distance);
-////        frontRightDrive.setTargetPosition(distance);
-////        backLeftDrive.setTargetPosition(-distance);
-////        backRightDrive.setTargetPosition(distance);
-////
-////        frontLeftDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-////        frontRightDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-////        backLeftDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-////        backRightDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-////
-////        turnLeft(power);
-////
-////        while(backLeftDrive.isBusy() && backRightDrive.isBusy() && frontLeftDrive.isBusy() && frontRightDrive.isBusy()){
-////
-////        }
-////
-////        stopDrive();
-////        backLeftDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-////        backRightDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-////        frontLeftDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-////        frontRightDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-////    }
-////
-////    public void turnRightDistance(double power, int distance)
-////    {
-////        frontRightDrive.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-////        frontLeftDrive.setMode(DcMotorController. RunMode.RESET_ENCODERS);
-////        backLeftDrive.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-////        backRightDrive.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-////
-////        frontLeftDrive.setTargetPosition(distance);
-////        frontRightDrive.setTargetPosition(-distance);
-////        backLeftDrive.setTargetPosition(distance);
-////        backRightDrive.setTargetPosition(-distance);
-////
-////        frontLeftDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-////        frontRightDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-////        backLeftDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-////        backRightDrive.setMode(DcMotorController.RunMode.RUN_TO_POSITION);
-////
-////        turnRight(power);
-////
-////        while(backLeftDrive.isBusy() && backRightDrive.isBusy() && frontLeftDrive.isBusy() && frontRightDrive.isBusy()){
-////
-////        }
-////
-////        stopDrive();
-////        backLeftDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-////        backRightDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-////        frontLeftDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-////        frontRightDrive.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-////    }
-////
-////    public void backwards(double val) {
-////        frontLeftDrive.setPower(-val);
-////        frontRightDrive.setPower(-val);
-////        backLeftDrive.setPower(-val);
-////        backRightDrive.setPower(-val);
-////    }
-////
-////    public void turnLeft(double val) {
-////        frontLeftDrive.setPower(-val);
-////        frontRightDrive.setPower(val);
-////        backLeftDrive.setPower(-val);
-////        backRightDrive.setPower(val);
-////    }
-////
-////    public void turnRight(double val) {
-////        frontLeftDrive.setPower(val);
-////        frontRightDrive.setPower(-val);
-////        backLeftDrive.setPower(val);
-////        backRightDrive.setPower(-val);
-////    }
-////
-////    public void stopDrive(){
-////        forward(0);
-////    }
-////
-////}

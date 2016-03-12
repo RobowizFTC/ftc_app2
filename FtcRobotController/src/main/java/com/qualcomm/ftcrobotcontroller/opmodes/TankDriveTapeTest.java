@@ -28,9 +28,6 @@ public class TankDriveTapeTest extends OpMode{
     Servo allClearLeft;
     Servo allClearRight;
 
-    boolean reversed = false;
-    boolean rightExtended = false;
-    boolean leftExtended = false;
     int i = 0;
     double pos;
 
@@ -66,6 +63,8 @@ public class TankDriveTapeTest extends OpMode{
 
         leftAdjust = hardwareMap.servo.get("leftAdjust");
         rightAdjust = hardwareMap.servo.get("rightAdjust");
+        rightAdjust.setPosition(Servo.MAX_POSITION);
+        leftAdjust.setPosition(Servo.MIN_POSITION);
 
         middle = hardwareMap.servo.get("middle");
 
@@ -138,30 +137,6 @@ public class TankDriveTapeTest extends OpMode{
             allClearRight.setPosition(Servo.MIN_POSITION);
         }
 
-//        if (gamepad1.b){
-//            if (rightExtended) {
-//                climberRight.setPosition(Servo.MIN_POSITION);
-//                rightExtended = false;
-//            }
-//            else {
-//                climberRight.setPosition(0.5);
-//                rightExtended = true;
-//            }
-//        }
-//
-//        if (gamepad1.x){
-//            if (leftExtended) {
-//                climberLeft.setPosition(Servo.MIN_POSITION);
-//                leftExtended = false;
-//            }
-//            else {
-//                climberLeft.setPosition(0.5);
-//                leftExtended = true;
-//            }
-//        }
-
-
-
         if (gamepad2.x) {
             if (deposit.getPosition() > 0.05){
                 deposit.setPosition(deposit.getPosition() - 0.05);
@@ -183,10 +158,6 @@ public class TankDriveTapeTest extends OpMode{
         }
 
 
-
-
-
-
         if (gamepad1.right_trigger > 0.3) {            //Controls for Right Tape Measure
             tapeRight.setPower(.5);
         }
@@ -201,8 +172,8 @@ public class TankDriveTapeTest extends OpMode{
 
 
         if(gamepad1.right_bumper){
-            if (rightAdjust.getPosition() < 0.99) {
-                rightAdjust.setPosition(rightAdjust.getPosition() + 0.01);
+            if (rightAdjust.getPosition() < 0.98) {
+                rightAdjust.setPosition(rightAdjust.getPosition() + 0.015);
             }
             if (leftAdjust.getPosition() > 0.01) {
                 leftAdjust.setPosition(leftAdjust.getPosition() - 0.01);
@@ -214,13 +185,11 @@ public class TankDriveTapeTest extends OpMode{
             if (rightAdjust.getPosition() > 0.01) {
                 rightAdjust.setPosition(rightAdjust.getPosition() - 0.01);
             }
-            if (leftAdjust.getPosition() < 0.99) {
-                leftAdjust.setPosition(leftAdjust.getPosition() + 0.01);
+            if (leftAdjust.getPosition() < 0.98) {
+                leftAdjust.setPosition(leftAdjust.getPosition() + 0.015);
             }
 
         }
-
-
 
 
         if (gamepad2.right_trigger > 0.3) {         //Controls for Left Tape Measure
@@ -234,33 +203,6 @@ public class TankDriveTapeTest extends OpMode{
             tapeLeft.setPower(0);
         }
 
-//        if(gamepad2.right_bumper){
-//            if (leftAdjust.getPosition() < 0.99) {
-//                leftAdjust.setPosition(leftAdjust.getPosition() + 0.01);
-//            }
-//        }
-//
-//        if ((gamepad2.left_bumper)){
-//            if (leftAdjust.getPosition() > 0.01) {
-//                leftAdjust.setPosition(leftAdjust.getPosition() - 0.01);
-//            }
-//        }
-
-
-//        if (gamepad1.guide) {
-//
-//            if (reversed) {
-//                reversed = false;
-//                adjust.setDirection(Servo.Direction.FORWARD);
-//                tape.setDirection(DcMotor.Direction.FORWARD);
-//            }
-//
-//            else {
-//                reversed = true;
-//                adjust.setDirection(Servo.Direction.REVERSE);
-//                tape.setDirection(DcMotor.Direction.REVERSE);
-//            }
-//        }
     }
 
 	/*
