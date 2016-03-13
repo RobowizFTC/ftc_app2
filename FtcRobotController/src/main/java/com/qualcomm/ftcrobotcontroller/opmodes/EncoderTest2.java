@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.LegacyModule;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -24,16 +25,25 @@ public class EncoderTest2 extends LinearOpMode {
     DcMotor RightR;
     DcMotor LeftF;
     DcMotor LeftR;
+
     Servo deposit;
     Servo depositTilt;
+
     Servo middle;
+
+    Servo allClearLeft;
+    Servo allClearRight;
+
     LightSensor lsL;
     LightSensor lsR;
+    LightSensor ls;
+    TouchSensor touch;
     UltrasonicSensor ultraL;
     UltrasonicSensor ultraR;
     LegacyModule legacy;
     double pulses = 1680;
     double circumference = 13.5;
+    boolean hit = false;
 
     private final int NAVX_DIM_I2C_PORT = 0;
     private AHRS navx_device;
@@ -42,7 +52,7 @@ public class EncoderTest2 extends LinearOpMode {
 
     private final byte NAVX_DEVICE_UPDATE_RATE_HZ = 50;
 
-    private final double TARGET_ANGLE_DEGREES = 80.0;
+    private double TARGET_ANGLE_DEGREES = 70.0;
     private final double TOLERANCE_DEGREES = 5.0;
     private final double MIN_MOTOR_OUTPUT_VALUE = -1.0;
     private final double MAX_MOTOR_OUTPUT_VALUE = 1.0;
@@ -69,10 +79,17 @@ public class EncoderTest2 extends LinearOpMode {
         LeftR = hardwareMap.dcMotor.get("backLeftDrive");
         LeftF = hardwareMap.dcMotor.get("frontLeftDrive");
         deposit = hardwareMap.servo.get("deposit");
+        deposit.setPosition(Servo.MIN_POSITION);
         depositTilt = hardwareMap.servo.get("depositTilt");
         middle = hardwareMap.servo.get("middle");
         middle.setPosition(0.5);
-//        legacy = hardwareMap.legacyModule.get("legacy");
+
+        allClearRight = hardwareMap.servo.get("allClearRight");
+        allClearLeft = hardwareMap.servo.get("allClearLeft");
+        allClearRight.setPosition(0.5);
+        allClearLeft.setPosition(0.5);
+
+        legacy = hardwareMap.legacyModule.get("legacy");
 
         // spooky sensors
 
@@ -82,7 +99,9 @@ public class EncoderTest2 extends LinearOpMode {
 //        legacy.enable9v(5, true); // enable the ports for the ULTRASONICS
 //        lsL = hardwareMap.lightSensor.get("lsL"); // left side Light sensor
 //        lsR = hardwareMap.lightSensor.get("lsR"); // right side Light sensor
-
+        ls = hardwareMap.lightSensor.get("ls");
+        ls.enableLed(true);
+        touch = hardwareMap.touchSensor.get("touch");
 
 
 
@@ -126,7 +145,7 @@ public class EncoderTest2 extends LinearOpMode {
         telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
 //
         int ticks = getTicks(50);                                                   //Out 2.5ish tiles
-//
+
         while (LeftR.getCurrentPosition() < ticks) {
             LeftF.setPower(0.95);
             LeftR.setPower(0.95);
@@ -227,7 +246,7 @@ public class EncoderTest2 extends LinearOpMode {
 
 
         telemetry.addData("While Loop", "Over");
-////         use straight line driving to move 50 ticks
+////         use straight line driving to move towards the zone
 
         LeftF.setDirection(DcMotor.Direction.FORWARD);
         LeftR.setDirection(DcMotor.Direction.FORWARD);
@@ -237,7 +256,7 @@ public class EncoderTest2 extends LinearOpMode {
 
         sleep(200);
         double drive_speed = 0.95;
-        ticks = getTicks(45);
+        ticks = getTicks(40);
         while (RightF.getCurrentPosition() < ticks) {
             if (yawPIDController.isNewUpdateAvailable(yawPIDResult)) {
                 if (yawPIDResult.isOnTarget()) {
@@ -275,59 +294,110 @@ public class EncoderTest2 extends LinearOpMode {
             }
         }
 
-        // theoretically should be in the vicinity of the line
+        LeftF.setPower(0);
+        LeftR.setPower(0);
+        RightF.setPower(0);
+        RightR.setPower(0);
 
-//        double distanceL = ultraL.getUltrasonicLevel();
-//        double distanceR = ultraR.getUltrasonicLevel();
-//        final double LIGHT_THRESHOLD = .5;
-//        double output = .8;
-//        while (distanceL > 50 && distanceR > 50) {
-//            // line follow
-//            double lightRight = lsR.getLightDetected();
-//            double lightLeft = lsL.getLightDetected();
-//            while (lightRight < LIGHT_THRESHOLD || lightLeft < LIGHT_THRESHOLD) {
-//
-//                if (lightRight < LIGHT_THRESHOLD) {
-//                    LeftF.setPower(-output);
-//                    LeftR.setPower(-output);
-//                    RightF.setPower(output);
-//                    RightR.setPower(output);
-//                    lightRight = lsR.getLightDetected();
-//                }
-//
-//                if (lightLeft < LIGHT_THRESHOLD) {
-//                    LeftF.setPower(output);
-//                    LeftR.setPower(output);
-//                    RightF.setPower(-output);
-//                    RightR.setPower(-output);
-//                    lightLeft = lsL.getLightDetected();
-//                }
-//
-//            }
-//
-//            distanceL = ultraL.getUltrasonicLevel();
-//            distanceR = ultraR.getUltrasonicLevel();
-//            telemetry.addData("UltraR: ", distanceR);
-//            telemetry.addData("UltraL: ", distanceL);
-//
-//        }
+        while (LeftF.getCurrentPosition() > 5) {
+            LeftF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+            LeftR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+            RightF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+            RightR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+            telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
+        }
 
-        telemetry.addData("finished", "finished");
+        LeftF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        LeftR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        RightF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        RightR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
 
-//        LeftR.setPower(0);
-//        LeftF.setPower(0);
-//        RightR.setPower(0);
-//        RightF.setPower(0);
-//        telemetry.addData("stopped", "stopped");
-//        sleep(1000);
-//        deposit.setPosition(Servo.MIN_POSITION);
-//        sleep(1000);
-//        depositTilt.setPosition(Servo.MAX_POSITION);
-//        sleep(1000);
-//        depositTilt.setPosition(Servo.MIN_POSITION);
-//        sleep(1000);
-//        deposit.setPosition(Servo.MAX_POSITION);
-//        sleep(1000);
+        // define variables for line following
+
+        double reflection = ls.getLightDetected();
+        double left, right;
+        double LIGHT_THRESHOLD = 0.3;
+        double MOTOR_POWER = 0.4;
+        ElapsedTime runtime = new ElapsedTime();
+        double TIMEOUT = 5.0;
+
+        // forward until hit line
+
+        while (reflection > LIGHT_THRESHOLD) {
+            LeftF.setPower(.7);
+            LeftR.setPower(.7);
+            RightR.setPower(.7);
+            RightF.setPower(.7);
+            reflection = ls.getLightDetected();
+            if (runtime.time() > TIMEOUT)
+                break;
+        }
+        sleep(200);
+        telemetry.addData("Detected the line", "aylmao");
+        LeftF.setPower(0);
+        LeftR.setPower(0);
+        RightR.setPower(0);
+        RightF.setPower(0);
+        sleep(200);
+
+        // actual line following
+        sleep(600);
+        LeftF.setPower(-1);
+        LeftR.setPower(-1);
+        sleep(400);
+        LeftF.setPower(0);
+        LeftR.setPower(0);
+        sleep(250);
+
+        while (!hit) {
+            reflection = ls.getLightDetected();
+            if (reflection > LIGHT_THRESHOLD) {
+                /*
+                 * if reflection is less than the threshold value, then assume we are above dark spot.
+                 * turn to the right.
+                 */
+                left = MOTOR_POWER;
+                right = 0.0;
+            } else {
+                /*
+                 * assume we are over a light spot.
+                 * turn to the left.
+                 */
+                left = 0.0;
+                right = MOTOR_POWER;
+            }
+
+            /*
+             * set the motor power
+             */
+
+            RightR.setPower(right);
+            LeftR.setPower(left);
+            RightF.setPower(right);
+            LeftF.setPower(left);
+
+            hit = touch.isPressed();
+            telemetry.addData("TOUCH", hit);
+        }
+
+
+        LeftR.setPower(0);
+        LeftF.setPower(0);
+        RightR.setPower(0);
+        RightF.setPower(0);
+
+        telemetry.addData("stopped", "stopped");
+
+        // deposit the ciimbers
+        sleep(1000);
+        deposit.setPosition(Servo.MIN_POSITION);
+        sleep(1000);
+        depositTilt.setPosition(Servo.MAX_POSITION);
+        sleep(1000);
+        depositTilt.setPosition(Servo.MIN_POSITION);
+        sleep(1000);
+        deposit.setPosition(Servo.MAX_POSITION);
+        sleep(1000);
 
     }
 

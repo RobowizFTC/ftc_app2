@@ -36,7 +36,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.LegacyModule;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-
+import com.qualcomm.robotcore.hardware.TouchSensor;
 /**
  * TeleOp Mode
  * <p>
@@ -44,34 +44,36 @@ import com.qualcomm.robotcore.hardware.Servo;
  */
 public class K9Line extends OpMode {
 
-	final static double MOTOR_POWER = 0.15; // Higher values will cause the robot to move faster
-	final static double HOLD_IR_SIGNAL_STRENGTH = 0.20; // Higher values will cause the robot to follow closer
-	final static double LIGHT_THRESHOLD = 0.5;
+    final static double MOTOR_POWER = -0.4; // Higher values will cause the robot to move faster
+    final static double HOLD_IR_SIGNAL_STRENGTH = 0.20; // Higher values will cause the robot to follow closer
+    final static double LIGHT_THRESHOLD = 0.3;
 
-	DcMotor backLeftDrive;
-//	DcMotor frontLeftDrive;
-	DcMotor backRightDrive;
-//	DcMotor frontRightDrive;
+    DcMotor backLeftDrive;
+    DcMotor frontLeftDrive;
+    DcMotor backRightDrive;
+    DcMotor frontRightDrive;
     LegacyModule legacy;
-	
-	// Servo claw;
-	// Servo arm;
-	LightSensor ls;
+    boolean hit = false;
 
-	/**
-	 * Constructor
-	 */
-	public K9Line() {
+    // Servo claw;
+    // Servo arm;
+    LightSensor ls;
+    TouchSensor touch;
 
-	}
+    /**
+     * Constructor
+     */
+    public K9Line() {
 
-	/*
+    }
+
+    /*
 	 * Code to run when the op mode is first enabled goes here
 	 *
 	 * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#start()
 	 */
-	@Override
-	public void init() {
+    @Override
+    public void init() {
 
 		/*
 		 * Use the hardwareMap to get the dc motors and servos by name.
@@ -89,33 +91,44 @@ public class K9Line extends OpMode {
 		 *    "servo_1" controls the arm joint of the manipulator.
 		 *    "servo_6" controls the claw joint of the manipulator.
 		 */
-		backRightDrive = hardwareMap.dcMotor.get("backRightDrive");
-		backLeftDrive = hardwareMap.dcMotor.get("backLeftDrive");
-		//frontLeftDrive = hardwareMap.dcMotor.get("frontLeftDrive");
-		//frontRightDrive = hardwareMap.dcMotor.get("frontRightDrive");
-        //frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        backRightDrive = hardwareMap.dcMotor.get("backRightDrive");
+        backLeftDrive = hardwareMap.dcMotor.get("backLeftDrive");
+        frontLeftDrive = hardwareMap.dcMotor.get("frontLeftDrive");
+        frontRightDrive = hardwareMap.dcMotor.get("frontRightDrive");
+        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         legacy = hardwareMap.legacyModule.get("legacy");
+        touch = hardwareMap.touchSensor.get("touch");
         legacy.enable9v(5, true);
 
 		/*
 		 * We also assume that we have a LEGO light sensor
 		 * with a name of "light_sensor" configured for our robot.
 		 */
-		ls = hardwareMap.lightSensor.get("ls");
+        ls = hardwareMap.lightSensor.get("ls");
+        ls.enableLed(true);
 
         // turn on LED of light sensor.
-	}
+    }
 
-	/*
+    /*
 	 * This method will be called repeatedly in a loop
 	 *
 	 * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#run()
 	 */
-	@Override
-	public void loop() {
-		double reflection = 0.0;
-		double left, right = 0.0;
+    @Override
+    public void loop() {
+        double reflection = 0.0;
+        double left, right = 0.0;
+
+
+        if (touch.isPressed()) {
+            backRightDrive.setPower(0);
+            backLeftDrive.setPower(0);
+            frontRightDrive.setPower(0);
+            frontLeftDrive.setPower(0);
+            hit = true;
+        }
 
         /*
          * As a temporary fix, turn on LED in run() event rather than in start().
@@ -126,46 +139,50 @@ public class K9Line extends OpMode {
 		/*
 		 * read the light sensor.
 		 */
-		reflection = ls.getLightDetected();
+
 
 		/*
 		 * compare measured value to threshold.
 		 */
-		if (reflection < LIGHT_THRESHOLD) {
-			/*
-			 * if reflection is less than the threshold value, then assume we are above dark spot.
-			 * turn to the right.
-			 */
-			left = MOTOR_POWER;
-			right = 0.0;
-		} else {
-			/*
-			 * assume we are over a light spot.
-			 * turn to the left.
-			 */
-			left = 0.0;
-			right = MOTOR_POWER;
-		}
+        else if (!hit) {
+            reflection = ls.getLightDetected();
+            if (reflection > LIGHT_THRESHOLD) {
+                /*
+                 * if reflection is less than the threshold value, then assume we are above dark spot.
+                 * turn to the right.
+                 */
+                left = MOTOR_POWER;
+                right = 0.0;
+            } else {
+                /*
+                 * assume we are over a light spot.
+                 * turn to the left.
+                 */
+                left = 0.0;
+                right = MOTOR_POWER;
+            }
 
-		/*
-		 * set the motor power
-		 */
-		backRightDrive.setPower(left);
-		backLeftDrive.setPower(right);
-        //frontRightDrive.setPower(right);
-        //frontLeftDrive.setPower(left);
-		/*
-		 * Send telemetry data back to driver station. Note that if we are using
-		 * a legacy NXT-compatible motor controller, then the getPower() method
-		 * will return a null value. The legacy NXT-compatible motor controllers
-		 * are currently write only.
-		 */
+            /*
+             * set the motor power
+             */
+            backRightDrive.setPower(right);
+            backLeftDrive.setPower(left);
+            frontRightDrive.setPower(right);
+            frontLeftDrive.setPower(left);
+            /*
+             * Send telemetry data back to driver station. Note that if we are using
+             * a legacy NXT-compatible motor controller, then the getPower() method
+             * will return a null value. The legacy NXT-compatible motor controllers
+             * are currently write only.
+             */
 
-		telemetry.addData("Text", "*** Robot Data***");
-		telemetry.addData("reflection", "reflection:  " + Double.toString(reflection));
-		telemetry.addData("left tgt pwr",  "left  pwr: " + Double.toString(left));
-		telemetry.addData("right tgt pwr", "right pwr: " + Double.toString(right));
-	}
+            telemetry.addData("Text", "*** Robot Data***");
+            telemetry.addData("reflection", "reflection:  " + Double.toString(reflection));
+            telemetry.addData("touch", "is:" + touch.isPressed());
+
+        }
+
+    }
 
 	/*
 	 * Code to run when the op mode is first disabled goes here
@@ -174,7 +191,10 @@ public class K9Line extends OpMode {
 	 */
 	@Override
 	public void stop() {
-
+        backRightDrive.setPower(0);
+        backLeftDrive.setPower(0);
+        frontRightDrive.setPower(0);
+        frontLeftDrive.setPower(0);
 	}
 
 }

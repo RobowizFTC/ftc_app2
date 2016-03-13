@@ -55,6 +55,7 @@ public class BasicLightSample extends OpMode {
         legacy = hardwareMap.legacyModule.get("legacy");
         light = hardwareMap.lightSensor.get("ls");
         legacy.enable9v(5, true);
+        light.enableLed(true);
     }
 
     @Override
