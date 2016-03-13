@@ -237,7 +237,7 @@ public class EncoderTest2 extends LinearOpMode {
 
         sleep(200);
         double drive_speed = 0.95;
-        ticks = getTicks(40);
+        ticks = getTicks(45);
         while (RightF.getCurrentPosition() < ticks) {
             if (yawPIDController.isNewUpdateAvailable(yawPIDResult)) {
                 if (yawPIDResult.isOnTarget()) {
@@ -314,226 +314,22 @@ public class EncoderTest2 extends LinearOpMode {
 
         telemetry.addData("finished", "finished");
 
-        LeftR.setPower(0);
-        LeftF.setPower(0);
-        RightR.setPower(0);
-        RightF.setPower(0);
-        telemetry.addData("stopped", "stopped");
-        sleep(1000);
-        deposit.setPosition(Servo.MIN_POSITION);
-        sleep(1000);
-        depositTilt.setPosition(Servo.MAX_POSITION);
-        sleep(1000);
-        depositTilt.setPosition(Servo.MIN_POSITION);
-        sleep(1000);
-        deposit.setPosition(Servo.MAX_POSITION);
-        sleep(1000);
+//        LeftR.setPower(0);
+//        LeftF.setPower(0);
+//        RightR.setPower(0);
+//        RightF.setPower(0);
+//        telemetry.addData("stopped", "stopped");
+//        sleep(1000);
+//        deposit.setPosition(Servo.MIN_POSITION);
+//        sleep(1000);
+//        depositTilt.setPosition(Servo.MAX_POSITION);
+//        sleep(1000);
+//        depositTilt.setPosition(Servo.MIN_POSITION);
+//        sleep(1000);
+//        deposit.setPosition(Servo.MAX_POSITION);
+//        sleep(1000);
 
     }
 
+
 }
-
-//        LeftF.setDirection(DcMotor.Direction.FORWARD);
-//        LeftR.setDirection(DcMotor.Direction.FORWARD);
-//
-//        LeftF.setPower(0);
-//        LeftR.setPower(0);
-//        RightF.setPower(0);
-//        RightR.setPower(0);
-//        while(RightR.getCurrentPosition() > 5)
-//        {
-//            LeftF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            LeftR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            RightF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            RightR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
-//        }
-//
-//        LeftF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        LeftR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        RightF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        RightR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
-//
-//
-//        ticks = getTicks(50);                                                   //Get in the vicinity of the zone
-//        while(RightF.getCurrentPosition() < ticks)
-//        {
-//            LeftF.setPower(0.95);
-//            LeftR.setPower(0.95);
-//            RightF.setPower(0.95);
-//            RightR.setPower(0.95);
-//        }
-//
-//        LeftF.setPower(0);
-//        LeftR.setPower(0);
-//        RightF.setPower(0);
-//        RightR.setPower(0);
-//
-//        while(RightF.getCurrentPosition() > 5)
-//        {
-//            LeftF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            LeftR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            RightF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            RightR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
-//        }
-
-
-
-//        while(LeftF.getCurrentPosition() < 1000);
-//        {
-//            LeftF.setPower(0.5);
-//            LeftR.setPower(0.5);
-//            RightF.setPower(0);
-//            RightR.setPower(0);
-//        }
-//        LeftF.setPower(0);
-//        LeftR.setPower(0);
-//        RightF.setPower(0);
-//        RightR.setPower(0);
-//        Sweeper.setPower(0);
-//        while(LeftF.getCurrentPosition() > 5)
-//        {
-//            LeftF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            LeftR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            RightF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            RightR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
-//        }
-//
-//        LeftF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        LeftR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        RightF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        RightR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
-//
-//        while(RightF.getCurrentPosition() < 1000)
-//        {
-//            LeftF.setPower(0.5);
-//            LeftR.setPower(0.5);
-//            RightF.setPower(0.5);
-//            RightR.setPower(0.5);
-//        }
-//        while(LeftF.getCurrentPosition() < 1000);
-//        {
-//            LeftF.setPower(0.5);
-//            LeftR.setPower(0.5);
-//            RightF.setPower(0);
-//            RightR.setPower(0);
-//        }
-//        LeftF.setPower(0);
-//        LeftR.setPower(0);
-//        RightF.setPower(0);
-//        RightR.setPower(0);
-//        while(LeftF.getCurrentPosition() > 5)
-//        {
-//            LeftF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            LeftR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            RightF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            RightR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
-//        }
-//
-//        LeftF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        LeftR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        RightF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        RightR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
-//
-//        while(RightF.getCurrentPosition() < 1000)
-//        {
-//            LeftF.setPower(0.5);
-//            LeftR.setPower(0.5);
-//            RightF.setPower(0.5);
-//            RightR.setPower(0.5);
-//        }
-//        while(LeftF.getCurrentPosition() < 1000);
-//        {
-//            LeftF.setPower(0.5);
-//            LeftR.setPower(0.5);
-//            RightF.setPower(0);
-//            RightR.setPower(0);
-//        }
-//        LeftF.setPower(0);
-//        LeftR.setPower(0);
-//        RightF.setPower(0);
-//        RightR.setPower(0);
-//        while(LeftF.getCurrentPosition() > 5)
-//        {
-//            LeftF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            LeftR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            RightF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            RightR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
-//        }
-//
-//        LeftF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        LeftR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        RightF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        RightR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
-//        while(RightF.getCurrentPosition() < 1000)
-//        {
-//            LeftF.setPower(0.5);
-//            LeftR.setPower(0.5);
-//            RightF.setPower(0.5);
-//            RightR.setPower(0.5);
-//        }
-//        while(LeftF.getCurrentPosition() < 1000);
-//        {
-//            LeftF.setPower(0.5);
-//            LeftR.setPower(0.5);
-//            RightF.setPower(0);
-//            RightR.setPower(0);
-//        }
-//        LeftF.setPower(0);
-//        LeftR.setPower(0);
-//        RightF.setPower(0);
-//        RightR.setPower(0);
-//        while(LeftF.getCurrentPosition() > 5)
-//        {
-//            LeftF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            LeftR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            RightF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            RightR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
-//        }
-//
-//        LeftF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        LeftR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        RightF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        RightR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
-//        while(RightF.getCurrentPosition() < 1000)
-//        {
-//            LeftF.setPower(0.5);
-//            LeftR.setPower(0.5);
-//            RightF.setPower(0.5);
-//            RightR.setPower(0.5);
-//        }
-//        while(LeftF.getCurrentPosition() < 1000);
-//        {
-//            LeftF.setPower(0.5);
-//            LeftR.setPower(0.5);
-//            RightF.setPower(0);
-//            RightR.setPower(0);
-//        }
-//        LeftF.setPower(0);
-//        LeftR.setPower(0);
-//        RightF.setPower(0);
-//        RightR.setPower(0);
-//        while(LeftF.getCurrentPosition() > 5)
-//        {
-//            LeftF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            LeftR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            RightF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            RightR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
-//            telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
-//        }
-//
-//        LeftF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        LeftR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        RightF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        RightR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
-//        telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
