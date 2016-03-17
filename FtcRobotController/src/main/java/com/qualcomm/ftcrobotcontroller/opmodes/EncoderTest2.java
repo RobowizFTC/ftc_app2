@@ -79,11 +79,15 @@ public class EncoderTest2 extends LinearOpMode {
         RightF.setDirection(DcMotor.Direction.REVERSE);
         LeftR = hardwareMap.dcMotor.get("backLeftDrive");
         LeftF = hardwareMap.dcMotor.get("frontLeftDrive");
-        deposit = hardwareMap.servo.get("deposit");
-        deposit.setPosition(Servo.MIN_POSITION);
-        depositTilt = hardwareMap.servo.get("depositTilt");
+
+
         middle = hardwareMap.servo.get("middle");
         middle.setPosition(0.5);
+
+        deposit = hardwareMap.servo.get("deposit");
+        deposit.setPosition(Servo.MAX_POSITION);
+        depositTilt = hardwareMap.servo.get("depositTilt");
+        depositTilt.setPosition(Servo.MIN_POSITION);
 
         allClearRight = hardwareMap.servo.get("allClearRight");
         allClearLeft = hardwareMap.servo.get("allClearLeft");
@@ -133,8 +137,7 @@ public class EncoderTest2 extends LinearOpMode {
         navx_device.zeroYaw();
         yawPIDResult = new navXPIDController.PIDResult();
 
-        deposit.setPosition(Servo.MAX_POSITION);
-        depositTilt.setPosition(Servo.MIN_POSITION);
+
 
         waitForStart();
 
@@ -367,15 +370,6 @@ public class EncoderTest2 extends LinearOpMode {
         LeftF.setDirection(DcMotor.Direction.FORWARD);
         LeftR.setDirection(DcMotor.Direction.FORWARD);
 
-//        sleep(200);
-//        telemetry.addData("Detected the line", "aylmao");
-//        LeftF.setPower(0);
-//        LeftR.setPower(0);
-//        RightR.setPower(0);
-//        RightF.setPower(0);
-//        sleep(200);
-//
-//
         // actual line following
         sleep(600);
         LeftF.setPower(-1);
@@ -425,12 +419,12 @@ public class EncoderTest2 extends LinearOpMode {
 
             hit = touch.isPressed();
 
-            if (hit) {
-                if(ultraLVal > 18 && ultraRVal > 18){
-                    abort = true;
-                    //ABORT MISSION WERE FUCKED
-                }
-            }
+//            if (hit) {
+//                if(ultraLVal > 18 && ultraRVal > 18){
+//                    abort = true;
+//                    //ABORT MISSION WERE DONE
+//                }
+//            }
 
             ultraLVal = ultraL.getUltrasonicLevel();
             ultraRVal = ultraR.getUltrasonicLevel();

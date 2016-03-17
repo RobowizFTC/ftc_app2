@@ -34,7 +34,7 @@ public class Basic2Ultra extends LinearOpMode {
         LeftR = hardwareMap.dcMotor.get("backLeftDrive");
         RightF = hardwareMap.dcMotor.get("frontRightDrive");
         RightR = hardwareMap.dcMotor.get("backRightDrive");
-        double ULTRA_THRESHOLD = 5.0;
+        double ULTRA_THRESHOLD = 1.0;
         double distanceL;
         double distanceR;
         double distanceFromWall = 30.0;
