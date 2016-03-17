@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.LegacyModule;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.UltrasonicSensor;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
+import com.qualcomm.robotcore.robocol.Telemetry;
 
 /**
  * TeleOp Mode
@@ -55,17 +56,18 @@ public class Basic2Ultra extends LinearOpMode {
                 distanceL = ultraL.getUltrasonicLevel();
                 distanceR = ultraR.getUltrasonicLevel();
             }
-
+            telemetry.addData(""+distanceL,""+distanceR);
             double power = scale(motor_power, distanceL, distanceR);
             if (distanceR > distanceL){
-                LeftF.setPower(-power);
-                LeftR.setPower(-power);
+
+                //LeftF.setPower(-power);
+                //LeftR.setPower(-power);
             }
 
 
             if (distanceL > distanceR) {
-                RightF.setPower(-power);
-                RightR.setPower(-power);
+                //RightF.setPower(-power);
+                //RightR.setPower(-power);
             }
 
             telemetry.addData("Output", power);

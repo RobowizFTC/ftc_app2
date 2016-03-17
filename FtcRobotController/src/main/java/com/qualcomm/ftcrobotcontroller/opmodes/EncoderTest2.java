@@ -41,6 +41,7 @@ public class EncoderTest2 extends LinearOpMode {
     UltrasonicSensor ultraL;
     UltrasonicSensor ultraR;
     LegacyModule legacy;
+
     double pulses = 1680;
     double circumference = 13.5;
     boolean hit = false;
@@ -52,7 +53,7 @@ public class EncoderTest2 extends LinearOpMode {
 
     private final byte NAVX_DEVICE_UPDATE_RATE_HZ = 50;
 
-    private double TARGET_ANGLE_DEGREES = 70.0;
+    private double TARGET_ANGLE_DEGREES = 65.0;
     private final double TOLERANCE_DEGREES = 5.0;
     private final double MIN_MOTOR_OUTPUT_VALUE = -1.0;
     private final double MAX_MOTOR_OUTPUT_VALUE = 1.0;
@@ -93,12 +94,12 @@ public class EncoderTest2 extends LinearOpMode {
 
         // spooky sensors
 
-//        ultraL = hardwareMap.ultrasonicSensor.get("ultraL"); // legacy
-//        ultraR = hardwareMap.ultrasonicSensor.get("ultraR"); // legacy
-//        legacy.enable9v(4, true);
-//        legacy.enable9v(5, true); // enable the ports for the ULTRASONICS
-//        lsL = hardwareMap.lightSensor.get("lsL"); // left side Light sensor
-//        lsR = hardwareMap.lightSensor.get("lsR"); // right side Light sensor
+        ultraL = hardwareMap.ultrasonicSensor.get("ultraL"); // legacy
+        ultraR = hardwareMap.ultrasonicSensor.get("ultraR"); // legacy
+        legacy.enable9v(4, true);
+        legacy.enable9v(5, true); // enable the ports for the ULTRASONICS
+        //lsL = hardwareMap.lightSensor.get("lsL"); // left side Light sensor
+        //lsR = hardwareMap.lightSensor.get("lsR"); // right side Light sensor
         ls = hardwareMap.lightSensor.get("ls");
         ls.enableLed(true);
         touch = hardwareMap.touchSensor.get("touch");
@@ -143,7 +144,7 @@ public class EncoderTest2 extends LinearOpMode {
         RightF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         RightR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
-//
+
         int ticks = getTicks(50);                                                   //Out 2.5ish tiles
 
         while (LeftR.getCurrentPosition() < ticks) {
@@ -173,29 +174,30 @@ public class EncoderTest2 extends LinearOpMode {
         RightF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         RightR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
 
-        /////////////////Turn 70 Degrees///////////////////
+//        /////////////////Turn 70 Degrees///////////////////
         LeftF.setDirection(DcMotor.Direction.REVERSE);
         LeftR.setDirection(DcMotor.Direction.REVERSE);
+
         navx_device = AHRS.getInstance(hardwareMap.deviceInterfaceModule.get("dim"),
                 NAVX_DIM_I2C_PORT,
                 AHRS.DeviceDataType.kProcessedData,
                 NAVX_DEVICE_UPDATE_RATE_HZ);
 
-//        while ( !calibration_complete ) {
-//            /* navX-Micro Calibration completes automatically ~15 seconds after it is
-//            powered on, as long as the device is still.  To handle the case where the
-//            navX-Micro has not been able to calibrate successfully, hold off using
-//            the navX-Micro Yaw value until calibration is complete.
-//             */
-//            calibration_complete = !navx_device.isCalibrating();
-//            if ( calibration_complete ) {
-//                navx_device.zeroYaw();
-//                telemetry.addData("navX-Micro", "worked");
-//            } else {
-//
-//                sleep(200);
-//            }
-//        }
+        while ( !calibration_complete ) {
+            /* navX-Micro Calibration completes automatically ~15 seconds after it is
+            powered on, as long as the device is still.  To handle the case where the
+            navX-Micro has not been able to calibrate successfully, hold off using
+            the navX-Micro Yaw value until calibration is complete.
+             */
+            calibration_complete = !navx_device.isCalibrating();
+            if ( calibration_complete ) {
+                navx_device.zeroYaw();
+                telemetry.addData("navX-Micro", "worked");
+            } else {
+
+                sleep(200);
+            }
+        }
         while (!calibration_complete) {
             /* navX-Micro Calibration completes automatically ~15 seconds after it is
             powered on, as long as the device is still.  To handle the case where the
@@ -207,6 +209,7 @@ public class EncoderTest2 extends LinearOpMode {
                 telemetry.addData("navX-Micro", "Startup Calibration in Progress");
             }
         }
+
         navx_device.zeroYaw();
         yawPIDController.enable(true);
         boolean turning = true;
@@ -230,6 +233,7 @@ public class EncoderTest2 extends LinearOpMode {
                 }
             }
         }
+
 
         while (LeftF.getCurrentPosition() > 5) {
             LeftF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
@@ -257,6 +261,7 @@ public class EncoderTest2 extends LinearOpMode {
         sleep(200);
         double drive_speed = 0.95;
         ticks = getTicks(40);
+
         while (RightF.getCurrentPosition() < ticks) {
             if (yawPIDController.isNewUpdateAvailable(yawPIDResult)) {
                 if (yawPIDResult.isOnTarget()) {
@@ -312,6 +317,7 @@ public class EncoderTest2 extends LinearOpMode {
         RightF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
         RightR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
 
+
         // define variables for line following
 
         double reflection = ls.getLightDetected();
@@ -332,6 +338,7 @@ public class EncoderTest2 extends LinearOpMode {
             if (runtime.time() > TIMEOUT)
                 break;
         }
+
         sleep(200);
         telemetry.addData("Detected the line", "aylmao");
         LeftF.setPower(0);
@@ -340,6 +347,35 @@ public class EncoderTest2 extends LinearOpMode {
         RightF.setPower(0);
         sleep(200);
 
+        while (LeftF.getCurrentPosition() > 5) {
+            LeftF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+            LeftR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+            RightF.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+            RightR.setMode(DcMotorController.RunMode.RESET_ENCODERS);
+            telemetry.addData("LeftF Position", LeftF.getCurrentPosition());
+        }
+
+        LeftF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        LeftR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        RightF.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);
+        RightR.setMode(DcMotorController.RunMode.RUN_USING_ENCODERS);       //Reset Encoders
+
+
+
+        sleep(200);
+
+        LeftF.setDirection(DcMotor.Direction.FORWARD);
+        LeftR.setDirection(DcMotor.Direction.FORWARD);
+
+//        sleep(200);
+//        telemetry.addData("Detected the line", "aylmao");
+//        LeftF.setPower(0);
+//        LeftR.setPower(0);
+//        RightR.setPower(0);
+//        RightF.setPower(0);
+//        sleep(200);
+//
+//
         // actual line following
         sleep(600);
         LeftF.setPower(-1);
@@ -348,8 +384,19 @@ public class EncoderTest2 extends LinearOpMode {
         LeftF.setPower(0);
         LeftR.setPower(0);
         sleep(250);
+        double ultraLVal = ultraL.getUltrasonicLevel();
+        double ultraRVal = ultraR.getUltrasonicLevel();
 
-        while (!hit) {
+        telemetry.addData("L", ultraLVal);
+        telemetry.addData("R",ultraRVal);
+        boolean abort = false;
+
+        while (ultraLVal > 16 && ultraRVal > 16 && !abort) {
+
+            telemetry.addData("TOUCH", hit);
+            telemetry.addData("L", ultraLVal);
+            telemetry.addData("R", ultraRVal);
+            telemetry.addData("reflection", reflection);
             reflection = ls.getLightDetected();
             if (reflection > LIGHT_THRESHOLD) {
                 /*
@@ -377,7 +424,20 @@ public class EncoderTest2 extends LinearOpMode {
             LeftF.setPower(left);
 
             hit = touch.isPressed();
-            telemetry.addData("TOUCH", hit);
+
+            if (hit) {
+                if(ultraLVal > 18 && ultraRVal > 18){
+                    abort = true;
+                    //ABORT MISSION WERE FUCKED
+                }
+            }
+
+            ultraLVal = ultraL.getUltrasonicLevel();
+            ultraRVal = ultraR.getUltrasonicLevel();
+            while (ultraLVal == 0 || ultraRVal == 0) {
+                ultraLVal = ultraL.getUltrasonicLevel();
+                ultraRVal = ultraR.getUltrasonicLevel();
+            }
         }
 
 
@@ -388,7 +448,7 @@ public class EncoderTest2 extends LinearOpMode {
 
         telemetry.addData("stopped", "stopped");
 
-        // deposit the ciimbers
+        // deposit the climbers
         sleep(1000);
         deposit.setPosition(Servo.MIN_POSITION);
         sleep(1000);
